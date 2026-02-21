@@ -8,7 +8,7 @@ let consultations = [];
 let tentativesConnexion = 0;
 let estGele = false;
 let geleJusqua = null;
-const CODE_SECRET = "2026";
+const CODE_SECRET = "********"; // Masqué pour la sécurité
 
 function getDateHeureActuelle() {
   const now = new Date();
@@ -30,10 +30,10 @@ function getTempsRestantGele() {
   return Math.max(0, Math.ceil((geleJusqua - Date.now()) / 1000 / 60));
 }
 
-// Styles CSS créatifs et élégants
+// Styles CSS royaux avec bordures dorées
 const getStyles = () => `
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
   @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 
   * {
@@ -43,332 +43,376 @@ const getStyles = () => `
   }
 
   body {
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(145deg, #f8faff 0%, #eef2f9 100%);
+    font-family: 'Cormorant Garamond', serif;
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
   }
 
-  /* Arrière-plan artistique */
-  .art-bg {
+  /* Effet de particules dorées */
+  .particules-dorees {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
-    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
   }
 
-  .art-circle {
+  .particule {
     position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffd700;
     border-radius: 50%;
-    background: linear-gradient(145deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    filter: blur(60px);
+    box-shadow: 0 0 20px #ffd700;
+    animation: flotterParticule 10s infinite linear;
   }
 
-  .art-circle-1 {
-    width: 500px;
-    height: 500px;
-    top: -200px;
-    right: -200px;
-    animation: floatCircle 20s infinite alternate;
+  @keyframes flotterParticule {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
   }
 
-  .art-circle-2 {
-    width: 600px;
-    height: 600px;
-    bottom: -300px;
-    left: -200px;
-    background: linear-gradient(145deg, rgba(255, 107, 107, 0.1), rgba(255, 142, 83, 0.1));
-    animation: floatCircle 25s infinite alternate-reverse;
-  }
-
-  .art-circle-3 {
-    width: 300px;
-    height: 300px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(145deg, rgba(46, 213, 115, 0.05), rgba(123, 237, 159, 0.05));
-    animation: pulseCircle 8s infinite ease-in-out;
-  }
-
-  @keyframes floatCircle {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    100% { transform: translate(100px, 100px) rotate(180deg); }
-  }
-
-  @keyframes pulseCircle {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.6; }
-  }
-
-  /* Conteneur principal */
-  .container-elegant {
+  /* Conteneur principal avec bordures dorées */
+  .container-royal {
     max-width: 1400px;
     margin: 2rem auto;
     padding: 2rem;
     position: relative;
     z-index: 10;
-    animation: fadeInScale 0.8s ease-out;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 70px;
+    border: 3px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 
+      0 0 50px rgba(255, 215, 0, 0.2),
+      inset 0 0 50px rgba(255, 215, 0, 0.1);
+    animation: bordureLumineuse 3s infinite alternate;
   }
 
-  @keyframes fadeInScale {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
+  @keyframes bordureLumineuse {
+    0% {
+      border-color: rgba(255, 215, 0, 0.3);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
     }
-    to {
-      opacity: 1;
-      transform: scale(1);
+    100% {
+      border-color: rgba(255, 215, 0, 0.8);
+      box-shadow: 0 0 80px rgba(255, 215, 0, 0.6);
     }
   }
 
-  /* Header artistique */
-  .header-art {
+  /* Logo animé */
+  .logo-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    perspective: 1000px;
+  }
+
+  .logo-royal {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotationLogo 10s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes rotationLogo {
+    0%, 100% {
+      transform: rotateY(0deg) rotateX(10deg);
+    }
+    25% {
+      transform: rotateY(90deg) rotateX(20deg);
+    }
+    50% {
+      transform: rotateY(180deg) rotateX(10deg);
+    }
+    75% {
+      transform: rotateY(270deg) rotateX(0deg);
+    }
+  }
+
+  .face-logo {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #ffd700, #ffa500);
+    border-radius: 30px;
+    box-shadow: 
+      0 20px 40px rgba(255, 215, 0, 0.3),
+      inset 0 -5px 15px rgba(0,0,0,0.3);
+    backface-visibility: visible;
+    border: 2px solid rgba(255,255,255,0.5);
+  }
+
+  .face-logo.face-avant {
+    transform: rotateY(0deg) translateZ(20px);
+  }
+
+  .face-logo.face-arriere {
+    transform: rotateY(180deg) translateZ(20px);
+    background: linear-gradient(145deg, #ffa500, #ffd700);
+  }
+
+  .face-logo.face-gauche {
+    transform: rotateY(-90deg) translateZ(20px);
+    background: linear-gradient(145deg, #ff8c00, #ffd700);
+  }
+
+  .face-logo.face-droite {
+    transform: rotateY(90deg) translateZ(20px);
+    background: linear-gradient(145deg, #ffd700, #ff8c00);
+  }
+
+  .face-logo span {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #1a1a2e;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+    transform: rotateY(0deg);
+  }
+
+  /* Header royal */
+  .header-royal {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 3rem;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 3rem;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    border-radius: 40px;
-    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50px;
+    border: 2px solid rgba(255, 215, 0, 0.2);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   }
 
-  .logo-masterpiece {
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .titre-royal h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(145deg, #ffd700, #ffa500, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    letter-spacing: 2px;
+  }
+
+  .titre-royal p {
+    color: #ffd700;
+    font-size: 1.2rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  }
+
+  /* Horloge royale */
+  .horloge-royale {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem 3rem;
+    border-radius: 60px;
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 30px rgba(255,215,0,0.3);
     display: flex;
     align-items: center;
     gap: 1.5rem;
   }
 
-  .logo-framed {
-    width: 90px;
-    height: 90px;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    border-radius: 30px;
+  .horloge-icone {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #ffd700, #ffa500);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 
-      10px 10px 20px rgba(102, 126, 234, 0.3),
-      -5px -5px 10px rgba(255, 255, 255, 0.5) inset;
-    position: relative;
-    overflow: hidden;
+    color: #1a1a2e;
+    font-size: 1.8rem;
+    animation: pulseDore 2s infinite;
   }
 
-  .logo-framed::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-    transform: rotate(45deg);
-    animation: shine 4s infinite;
+  @keyframes pulseDore {
+    0%, 100% {
+      box-shadow: 0 0 30px #ffd700;
+    }
+    50% {
+      box-shadow: 0 0 60px #ffd700;
+    }
   }
 
-  @keyframes shine {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) rotate(45deg); }
-  }
-
-  .logo-framed span {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    z-index: 2;
-  }
-
-  .title-art h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background: linear-gradient(145deg, #2c3e50, #3498db);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0.3rem;
-  }
-
-  .title-art p {
-    color: #666;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-  }
-
-  .title-art i {
-    color: #ff6b6b;
-  }
-
-  /* Horloge design */
-  .horloge-design {
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-    padding: 1rem 2rem;
-    border-radius: 60px;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    border: 1px solid rgba(255,255,255,0.6);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-  }
-
-  .horloge-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.3rem;
-    animation: pulseIcon 2s infinite;
-  }
-
-  @keyframes pulseIcon {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-
-  .horloge-digital {
-    font-size: 1.6rem;
+  .horloge-texte {
+    font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.5);
+    font-family: 'Playfair Display', serif;
   }
 
-  /* Cartes statistiques élégantes */
-  .stats-elegance {
+  /* Cartes statistiques royales */
+  .stats-royales {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
     margin-bottom: 3rem;
   }
 
-  .carte-stat {
-    background: white;
-    padding: 2rem;
-    border-radius: 30px;
-    box-shadow: 
-      0 20px 40px -15px rgba(0,0,0,0.1),
-      0 0 0 1px rgba(255,255,255,0.8) inset;
+  .carte-royale {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    padding: 2.5rem;
+    border-radius: 40px;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
   }
 
-  .carte-stat::after {
+  .carte-royale::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 5px;
-    background: linear-gradient(90deg, #667eea, #764ba2, #ff6b6b);
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 40px;
+    background: linear-gradient(145deg, #ffd700, transparent, #ffd700);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
   }
 
-  .carte-stat:hover {
-    transform: translateY(-15px) rotate(2deg);
-    box-shadow: 0 40px 60px -15px rgba(102, 126, 234, 0.3);
+  .carte-royale:hover::before {
+    opacity: 0.3;
   }
 
-  .stat-icon-art {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(145deg, #667eea10, #764ba210);
-    border-radius: 20px;
+  .carte-royale:hover {
+    transform: translateY(-15px) scale(1.02);
+    border-color: #ffd700;
+    box-shadow: 0 30px 50px rgba(255,215,0,0.2);
+  }
+
+  .icone-carte {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(145deg, #ffd70020, #ffa50020);
+    border: 2px solid #ffd700;
+    border-radius: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 1.5rem;
-    font-size: 2rem;
-    color: #667eea;
+    font-size: 2.5rem;
+    color: #ffd700;
     transition: all 0.3s ease;
   }
 
-  .carte-stat:hover .stat-icon-art {
-    transform: scale(1.1) rotate(5deg);
-    color: #764ba2;
+  .carte-royale:hover .icone-carte {
+    transform: rotate(15deg) scale(1.1);
+    background: linear-gradient(145deg, #ffd70040, #ffa50040);
+    box-shadow: 0 0 40px #ffd700;
   }
 
-  .stat-chiffre {
-    font-size: 2.8rem;
+  .chiffre-carte {
+    font-size: 3.5rem;
     font-weight: 900;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #ffd700;
     line-height: 1;
     margin-bottom: 0.5rem;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 0 0 20px rgba(255,215,0,0.5);
   }
 
-  .stat-label-art {
-    color: #666;
+  .label-carte {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.2rem;
     font-weight: 500;
-    text-transform: uppercase;
     letter-spacing: 2px;
-    font-size: 0.85rem;
+    text-transform: uppercase;
   }
 
-  /* Barre de recherche artistique */
-  .recherche-art {
+  /* Barre de recherche royale */
+  .recherche-royale {
     margin-bottom: 2rem;
   }
 
-  .wrapper-recherche {
+  .wrapper-recherche-royal {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
   }
 
-  .input-art {
+  .input-royal {
     flex: 1;
     min-width: 300px;
-    padding: 1.5rem 2rem;
-    border: none;
+    padding: 1.8rem 2.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 215, 0, 0.3);
     border-radius: 60px;
-    background: white;
-    box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: white;
     transition: all 0.3s ease;
-    border: 2px solid transparent;
   }
 
-  .input-art:focus {
+  .input-royal:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 20px 40px -15px rgba(102, 126, 234, 0.3);
+    border-color: #ffd700;
+    box-shadow: 0 0 40px rgba(255,215,0,0.3);
     transform: scale(1.02);
   }
 
-  .btn-art {
-    padding: 1.5rem 3rem;
+  .input-royal::placeholder {
+    color: rgba(255,255,255,0.5);
+  }
+
+  .btn-royal {
+    padding: 1.8rem 3.5rem;
+    background: linear-gradient(145deg, #ffd700, #ffa500);
     border: none;
     border-radius: 60px;
-    font-weight: 600;
-    font-size: 1rem;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #1a1a2e;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 0.8rem;
-    font-family: 'Montserrat', sans-serif;
+    gap: 1rem;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 10px 30px rgba(255,215,0,0.3);
   }
 
-  .btn-art::before {
+  .btn-royal::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -376,58 +420,49 @@ const getStyles = () => `
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.5);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
 
-  .btn-art:hover::before {
-    width: 300px;
-    height: 300px;
+  .btn-royal:hover::before {
+    width: 400px;
+    height: 400px;
   }
 
-  .btn-primaire {
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    color: white;
-    box-shadow: 0 15px 30px -10px #667eea;
-  }
-
-  .btn-primaire:hover {
+  .btn-royal:hover {
     transform: translateY(-5px);
-    box-shadow: 0 25px 40px -10px #667eea;
+    box-shadow: 0 20px 40px rgba(255,215,0,0.5);
   }
 
-  .btn-secondaire {
-    background: white;
-    color: #667eea;
-    border: 2px solid #667eea20;
+  .btn-secondaire-royal {
+    background: transparent;
+    border: 2px solid #ffd700;
+    color: #ffd700;
+    box-shadow: none;
   }
 
-  .btn-secondaire:hover {
-    background: #f8faff;
-    border-color: #667eea;
-    transform: translateY(-5px);
+  .btn-secondaire-royal:hover {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
   }
 
-  /* Filtres élégants */
-  .filtres-elegants {
+  /* Filtres royaux */
+  .filtres-royaux {
     margin-top: 1rem;
-    padding: 2rem;
-    background: white;
-    border-radius: 40px;
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    border: 2px solid rgba(255,215,0,0.3);
     display: none;
-    animation: slideDownFade 0.4s ease;
+    animation: apparitionFiltres 0.4s ease;
   }
 
-  .filtres-elegants.active {
-    display: block;
-  }
-
-  @keyframes slideDownFade {
+  @keyframes apparitionFiltres {
     from {
       opacity: 0;
-      transform: translateY(-20px);
+      transform: translateY(-30px);
     }
     to {
       opacity: 1;
@@ -435,500 +470,526 @@ const getStyles = () => `
     }
   }
 
-  .grille-filtres {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .item-filtre {
-    position: relative;
-  }
-
-  .item-filtre label {
+  .filtres-royaux.active {
     display: block;
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
-    font-weight: 500;
-    font-size: 0.9rem;
   }
 
-  .item-filtre input,
-  .item-filtre select {
-    width: 100%;
-    padding: 1rem;
-    border: 2px solid #eef2f9;
-    border-radius: 20px;
-    font-family: 'Montserrat', sans-serif;
-    transition: all 0.3s ease;
-  }
-
-  .item-filtre input:focus,
-  .item-filtre select:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 5px #667eea20;
-  }
-
-  /* Tableau élégant */
-  .tableau-container {
-    overflow-x: auto;
-    border-radius: 30px;
-    background: white;
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+  .grille-filtres-royaux {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
     margin-bottom: 2rem;
   }
 
-  .tableau-elegant {
+  .item-filtre-royal label {
+    display: block;
+    margin-bottom: 0.8rem;
+    color: #ffd700;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
+
+  .item-filtre-royal input,
+  .item-filtre-royal select {
+    width: 100%;
+    padding: 1.2rem;
+    background: rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 30px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: white;
+    transition: all 0.3s ease;
+  }
+
+  .item-filtre-royal input:focus,
+  .item-filtre-royal select:focus {
+    outline: none;
+    border-color: #ffd700;
+    box-shadow: 0 0 30px rgba(255,215,0,0.3);
+  }
+
+  /* Tableau royal */
+  .tableau-container-royal {
+    overflow-x: auto;
+    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,215,0,0.3);
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  .tableau-royal {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 8px;
   }
 
-  .tableau-elegant th {
-    padding: 1.5rem 1rem;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    color: white;
-    font-weight: 600;
-    font-size: 0.95rem;
+  .tableau-royal th {
+    padding: 2rem 1.5rem;
+    background: linear-gradient(145deg, #ffd700, #ffa500);
+    color: #1a1a2e;
+    font-weight: 700;
+    font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: 'Playfair Display', serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
     position: relative;
   }
 
-  .tableau-elegant th:first-child {
-    border-radius: 20px 0 0 20px;
+  .tableau-royal th:first-child {
+    border-radius: 30px 0 0 30px;
   }
 
-  .tableau-elegant th:last-child {
-    border-radius: 0 20px 20px 0;
+  .tableau-royal th:last-child {
+    border-radius: 0 30px 30px 0;
   }
 
-  .tableau-elegant th:hover {
-    background: linear-gradient(145deg, #764ba2, #667eea);
+  .tableau-royal th:hover {
+    background: linear-gradient(145deg, #ffa500, #ffd700);
+    transform: scale(1.02);
+    box-shadow: 0 0 40px #ffd700;
   }
 
-  .tableau-elegant th i {
-    margin-left: 0.5rem;
-    opacity: 0.8;
-  }
-
-  .tableau-elegant td {
-    padding: 1.2rem 1rem;
-    background: #f8faff;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-
-  .tableau-elegant tr {
+  .tableau-royal td {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
     transition: all 0.3s ease;
   }
 
-  .tableau-elegant tr:hover td {
-    background: linear-gradient(145deg, #667eea10, #764ba210);
+  .tableau-royal tr:hover td {
+    background: rgba(255,215,0,0.05);
     transform: scale(1.01);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 5px 20px rgba(255,215,0,0.2);
   }
 
-  /* Badges de statut */
-  .badge {
-    padding: 0.5rem 1rem;
-    border-radius: 60px;
-    font-weight: 500;
-    font-size: 0.85rem;
+  /* Badges dorés */
+  .badge-royal {
+    padding: 0.6rem 1.2rem;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 0.95rem;
     display: inline-block;
+    border: 1px solid;
   }
 
-  .badge-prorogation-oui {
-    background: #fff3cd;
-    color: #856404;
+  .badge-oui {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
+    border-color: #ffd700;
   }
 
-  .badge-prorogation-non {
-    background: #d4edda;
-    color: #155724;
+  .badge-non {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0.2);
   }
 
   .badge-offres-positif {
-    color: #2ecc71;
+    color: #ffd700;
     font-weight: 700;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
   }
 
-  .badge-offres-negatif {
-    color: #e74c3c;
-    font-weight: 700;
-  }
-
-  /* Boutons d'action artistiques */
-  .actions-art {
+  /* Boutons d'action dorés */
+  .actions-royales {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.8rem;
   }
 
-  .btn-action-art {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 14px;
-    color: white;
+  .btn-action-royal {
+    width: 45px;
+    height: 45px;
+    border: 2px solid #ffd700;
+    background: transparent;
+    border-radius: 15px;
+    color: #ffd700;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 1.1rem;
     position: relative;
     overflow: hidden;
   }
 
-  .btn-action-art::before {
+  .btn-action-royal::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(145deg, rgba(255,255,255,0.3), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,215,0,0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s, height 0.4s;
   }
 
-  .btn-action-art:hover::before {
-    transform: translateX(0);
+  .btn-action-royal:hover::before {
+    width: 60px;
+    height: 60px;
   }
 
-  .btn-action-art:hover {
+  .btn-action-royal:hover {
+    background: #ffd700;
+    color: #1a1a2e;
     transform: translateY(-5px) rotate(5deg);
+    box-shadow: 0 0 30px #ffd700;
   }
 
-  .btn-voir { background: linear-gradient(145deg, #3498db, #2980b9); }
-  .btn-modifier { background: linear-gradient(145deg, #2ecc71, #27ae60); }
-  .btn-supprimer { background: linear-gradient(145deg, #e74c3c, #c0392b); }
-
-  /* Modal artistique */
-  .modal-art {
+  /* Modal royal */
+  .modal-royal {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
     align-items: center;
     justify-content: center;
     z-index: 9999;
   }
 
-  .modal-art.active {
+  .modal-royal.active {
     display: flex;
-    animation: modalArtIn 0.4s ease;
+    animation: modalEntree 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  @keyframes modalArtIn {
+  @keyframes modalEntree {
     from {
       opacity: 0;
-      transform: scale(0.8) translateY(30px);
+      transform: scale(0.6) rotate(-5deg);
     }
     to {
       opacity: 1;
-      transform: scale(1) translateY(0);
+      transform: scale(1) rotate(0);
     }
   }
 
-  .contenu-modal-art {
-    background: linear-gradient(145deg, #ffffff, #f8faff);
-    padding: 3rem;
-    border-radius: 60px;
-    max-width: 600px;
+  .contenu-modal-royal {
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    padding: 4rem;
+    border-radius: 80px;
+    max-width: 700px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+    border: 3px solid #ffd700;
     box-shadow: 
-      0 40px 80px -20px rgba(0,0,0,0.3),
-      0 0 0 2px rgba(255,255,255,0.8) inset;
+      0 0 100px rgba(255,215,0,0.3),
+      inset 0 0 50px rgba(255,215,0,0.1);
     position: relative;
   }
 
-  .entete-modal-art {
+  .entete-modal-royal {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 3rem;
+  }
+
+  .entete-modal-royal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.5);
+  }
+
+  .fermer-modal-royal {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,215,0,0.1);
+    border: 2px solid #ffd700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #ffd700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .fermer-modal-royal:hover {
+    background: #ffd700;
+    color: #1a1a2e;
+    transform: rotate(90deg);
+    box-shadow: 0 0 40px #ffd700;
+  }
+
+  /* Formulaire royal */
+  .groupe-form-royal {
     margin-bottom: 2rem;
   }
 
-  .entete-modal-art h2 {
-    font-size: 2rem;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .fermer-modal {
-    width: 50px;
-    height: 50px;
-    background: white;
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  }
-
-  .fermer-modal:hover {
-    transform: rotate(90deg);
-    background: #e74c3c;
-    color: white;
-  }
-
-  /* Formulaire élégant */
-  .groupe-form {
-    margin-bottom: 1.8rem;
-  }
-
-  .groupe-form label {
+  .groupe-form-royal label {
     display: block;
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
+    margin-bottom: 0.8rem;
+    color: #ffd700;
+    font-size: 1.2rem;
     font-weight: 600;
-    font-size: 1rem;
+    letter-spacing: 1px;
   }
 
-  .controle-form {
+  .controle-form-royal {
     width: 100%;
-    padding: 1rem 1.5rem;
-    border: 2px solid #eef2f9;
-    border-radius: 25px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1rem;
+    padding: 1.2rem 2rem;
+    background: rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 40px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: white;
     transition: all 0.3s ease;
-    background: white;
   }
 
-  .controle-form:focus {
+  .controle-form-royal:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 5px #667eea20;
+    border-color: #ffd700;
+    box-shadow: 0 0 40px rgba(255,215,0,0.3);
     transform: translateY(-3px);
   }
 
-  .radio-groupe {
+  .radio-groupe-royal {
     display: flex;
-    gap: 2rem;
-    background: #f8faff;
-    padding: 1rem 1.5rem;
-    border-radius: 25px;
+    gap: 3rem;
+    background: rgba(0,0,0,0.2);
+    padding: 1.5rem 2rem;
+    border-radius: 40px;
+    border: 2px solid rgba(255,215,0,0.2);
   }
 
-  .radio-groupe label {
+  .radio-groupe-royal label {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.8rem;
+    color: rgba(255,255,255,0.9);
     cursor: pointer;
-    font-weight: 500;
   }
 
-  .radio-groupe input[type="radio"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #667eea;
+  .radio-groupe-royal input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #ffd700;
   }
 
-  /* Pagination élégante */
-  .pagination-elegante {
+  /* Pagination royale */
+  .pagination-royale {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.8rem;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 2rem;
   }
 
-  .page-btn-art {
-    width: 50px;
-    height: 50px;
-    border: none;
-    border-radius: 16px;
-    background: white;
-    color: #2c3e50;
-    font-weight: 600;
+  .page-btn-royal {
+    width: 55px;
+    height: 55px;
+    background: transparent;
+    border: 2px solid #ffd700;
+    border-radius: 18px;
+    color: #ffd700;
+    font-weight: 700;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
 
-  .page-btn-art.active {
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    color: white;
+  .page-btn-royal.active {
+    background: #ffd700;
+    color: #1a1a2e;
     transform: scale(1.1);
+    box-shadow: 0 0 40px #ffd700;
   }
 
-  .page-btn-art:hover:not(.active) {
-    background: #f0f3ff;
+  .page-btn-royal:hover:not(.active) {
+    background: rgba(255,215,0,0.1);
     transform: translateY(-5px);
   }
 
-  /* Footer artistique */
-  .footer-art {
+  /* Footer royal */
+  .footer-royal {
     margin-top: 3rem;
-    padding: 2rem;
-    background: rgba(255, 255, 255, 0.7);
+    padding: 2.5rem;
+    background: rgba(0,0,0,0.3);
     backdrop-filter: blur(10px);
-    border-radius: 40px;
+    border-radius: 50px;
+    border: 2px solid rgba(255,215,0,0.3);
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
     align-items: center;
     justify-content: space-between;
-    color: #2c3e50;
-    border: 1px solid rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.8);
+    font-size: 1.1rem;
   }
 
-  .social-art {
+  .social-royal {
     display: flex;
     gap: 1rem;
   }
 
-  .social-link-art {
-    width: 45px;
-    height: 45px;
-    background: white;
+  .social-link-royal {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,215,0,0.1);
+    border: 2px solid #ffd700;
     border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #667eea;
+    color: #ffd700;
     text-decoration: none;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
   }
 
-  .social-link-art:hover {
+  .social-link-royal:hover {
+    background: #ffd700;
+    color: #1a1a2e;
     transform: translateY(-5px) rotate(360deg);
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    color: white;
+    box-shadow: 0 0 30px #ffd700;
   }
 
-  .designer-name {
-    color: #764ba2;
+  .designer-royal {
+    color: #ffd700;
     font-weight: 700;
     position: relative;
+    font-size: 1.3rem;
   }
 
-  .designer-name::after {
-    content: '✨';
+  .designer-royal::before,
+  .designer-royal::after {
+    content: '👑';
     position: absolute;
-    top: -10px;
-    right: -20px;
-    animation: sparkle 1s infinite;
+    font-size: 1.5rem;
+    animation: couronne 2s infinite;
   }
 
-  @keyframes sparkle {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.5); }
+  .designer-royal::before {
+    left: -30px;
   }
 
-  /* Page de connexion artistique */
-  .login-art {
-    max-width: 500px;
+  .designer-royal::after {
+    right: -30px;
+  }
+
+  @keyframes couronne {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+  }
+
+  /* Page de connexion royale */
+  .login-royal {
+    max-width: 550px;
     margin: 3rem auto;
     position: relative;
+    z-index: 10;
   }
 
-  .carte-login {
-    background: rgba(255, 255, 255, 0.95);
+  .carte-login-royale {
+    background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(20px);
-    padding: 3rem;
-    border-radius: 70px;
-    box-shadow: 
-      0 40px 80px -20px rgba(0,0,0,0.3),
-      0 0 0 2px rgba(255,255,255,0.8) inset;
+    padding: 4rem;
+    border-radius: 80px;
+    border: 3px solid rgba(255,215,0,0.3);
+    box-shadow: 0 0 100px rgba(255,215,0,0.2);
+    animation: bordureLumineuse 3s infinite alternate;
   }
 
-  .entete-login {
+  .entete-login-royal {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
   }
 
-  .logo-login-art {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 1.5rem;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    border-radius: 40px;
+  .logo-login-royal {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(145deg, #ffd700, #ffa500);
+    border-radius: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: floatLogo 4s infinite ease-in-out;
-    box-shadow: 0 20px 40px -10px #667eea;
+    animation: flottementLogo 4s infinite ease-in-out;
+    border: 3px solid rgba(255,255,255,0.3);
+    box-shadow: 0 0 60px #ffd700;
   }
 
-  @keyframes floatLogo {
+  @keyframes flottementLogo {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(5deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
   }
 
-  .logo-login-art span {
-    font-size: 3.5rem;
-    color: white;
+  .logo-login-royal span {
+    font-size: 4rem;
+    color: #1a1a2e;
   }
 
-  .tentatives-art {
+  .tentatives-royales {
     display: flex;
-    gap: 1rem;
+    gap: 1.2rem;
     justify-content: center;
-    margin: 2rem 0;
+    margin: 2.5rem 0;
   }
 
-  .bulle-tentative {
-    width: 25px;
-    height: 25px;
+  .bulle-tentative-royale {
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background: #eef2f9;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid;
     transition: all 0.3s ease;
-    position: relative;
   }
 
-  .bulle-tentative.active {
-    background: #2ecc71;
-    box-shadow: 0 0 30px #2ecc71;
+  .bulle-tentative-royale.active {
+    background: #ffd700;
+    border-color: #ffd700;
+    box-shadow: 0 0 40px #ffd700;
     animation: pulseBulle 1s infinite;
   }
 
-  .bulle-tentative.used {
+  .bulle-tentative-royale.used {
     background: #e74c3c;
-    box-shadow: 0 0 30px #e74c3c;
-  }
-
-  @keyframes pulseBulle {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
+    border-color: #e74c3c;
+    box-shadow: 0 0 40px #e74c3c;
   }
 
   /* Toast notifications */
-  .toast-art {
+  .toast-royal {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    background: white;
-    padding: 1.2rem 2rem;
+    background: rgba(26, 26, 46, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem 3rem;
     border-radius: 60px;
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.2);
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 50px rgba(255,215,0,0.3);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.2rem;
     z-index: 10000;
     animation: slideInRight 0.3s ease;
-    border-left: 5px solid #667eea;
-    font-weight: 500;
+    color: #ffd700;
+    font-size: 1.2rem;
   }
 
-  .toast-art.success { border-left-color: #2ecc71; }
-  .toast-art.error { border-left-color: #e74c3c; }
-  .toast-art.info { border-left-color: #3498db; }
+  .toast-royal.success { border-left: 8px solid #2ecc71; }
+  .toast-royal.error { border-left: 8px solid #e74c3c; }
+  .toast-royal.info { border-left: 8px solid #3498db; }
 
   @keyframes slideInRight {
     from {
@@ -941,107 +1002,85 @@ const getStyles = () => `
     }
   }
 
-  /* Responsive design */
+  /* Responsive */
   @media (max-width: 1024px) {
-    .container-elegant {
+    .container-royal {
       padding: 1.5rem;
+      margin: 1rem;
     }
 
-    .title-art h1 {
-      font-size: 1.8rem;
+    .titre-royal h1 {
+      font-size: 2rem;
     }
   }
 
   @media (max-width: 768px) {
-    .header-art {
+    .header-royal {
       flex-direction: column;
       text-align: center;
-      padding: 1.5rem;
     }
 
-    .logo-masterpiece {
+    .logo-section {
       flex-direction: column;
     }
 
-    .stats-elegance {
+    .stats-royales {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    .wrapper-recherche {
+    .wrapper-recherche-royal {
       flex-direction: column;
     }
 
-    .btn-art {
+    .btn-royal {
       width: 100%;
       justify-content: center;
     }
 
-    .grille-filtres {
-      grid-template-columns: 1fr;
-    }
-
-    .footer-art {
+    .footer-royal {
       flex-direction: column;
       text-align: center;
     }
 
-    .contenu-modal-art {
-      padding: 1.5rem;
+    .contenu-modal-royal {
+      padding: 2rem;
+    }
+
+    .designer-royal::before,
+    .designer-royal::after {
+      display: none;
     }
   }
 
   @media (max-width: 480px) {
-    .stats-elegance {
+    .stats-royales {
       grid-template-columns: 1fr;
     }
 
-    .actions-art {
+    .actions-royales {
       flex-direction: column;
     }
 
-    .btn-action-art {
+    .btn-action-royal {
       width: 100%;
     }
 
-    .horloge-design {
-      width: 100%;
-      justify-content: center;
+    .horloge-royale {
+      padding: 1rem 2rem;
     }
 
-    .radio-groupe {
+    .horloge-texte {
+      font-size: 1.4rem;
+    }
+
+    .radio-groupe-royal {
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 1rem;
     }
-  }
 
-  /* Animations supplémentaires */
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .float-animation {
-    animation: float 3s infinite ease-in-out;
-  }
-
-  /* Scrollbar personnalisée */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    border-radius: 10px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(145deg, #764ba2, #667eea);
+    .carte-login-royale {
+      padding: 2rem;
+    }
   }
 </style>
 `;
@@ -1061,7 +1100,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Page de connexion artistique
+// Page de connexion royale
 app.get("/", (req, res) => {
   const minutesRestants = getTempsRestantGele();
   
@@ -1072,43 +1111,53 @@ app.get("/", (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>✨ SARPI - Système temporairement gelé</title>
+      <title>👑 SARPI - Système Royal Gelé</title>
       ${getStyles()}
     </head>
     <body>
-      <div class="art-bg">
-        <div class="art-circle art-circle-1"></div>
-        <div class="art-circle art-circle-2"></div>
-        <div class="art-circle art-circle-3"></div>
-      </div>
+      <div class="particules-dorees" id="particules"></div>
 
-      <div class="login-art">
-        <div class="carte-login" style="text-align: center;">
-          <div class="logo-login-art" style="background: linear-gradient(145deg, #e74c3c, #c0392b);">
+      <div class="login-royal">
+        <div class="carte-login-royale" style="text-align: center;">
+          <div class="logo-login-royal" style="background: linear-gradient(145deg, #e74c3c, #c0392b);">
             <span>❄️</span>
           </div>
           
-          <h1 style="font-size: 2.5rem; margin: 1.5rem 0; color: #e74c3c;">Système gelé</h1>
+          <h1 style="font-size: 3rem; margin: 2rem 0; color: #e74c3c; font-family: 'Playfair Display', serif;">Système Gelé</h1>
           
-          <p style="color: #666; margin-bottom: 2rem; font-size: 1.1rem;">
+          <p style="color: rgba(255,255,255,0.8); margin-bottom: 2rem; font-size: 1.3rem;">
             Trop de tentatives de connexion échouées
           </p>
           
-          <div style="font-size: 4rem; font-weight: 900; background: linear-gradient(145deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 2rem 0;">
+          <div style="font-size: 5rem; font-weight: 900; color: #ffd700; margin: 2rem 0; font-family: 'Playfair Display', serif; text-shadow: 0 0 50px #ffd700;">
             ${minutesRestants}:00
           </div>
           
-          <p style="color: #666;">minutes restantes avant déblocage</p>
+          <p style="color: #ffd700; font-size: 1.3rem;">minutes restantes avant déblocage</p>
           
-          <div class="tentatives-art" style="margin-top: 2rem;">
-            <div class="bulle-tentative used"></div>
-            <div class="bulle-tentative used"></div>
-            <div class="bulle-tentative used"></div>
+          <div class="tentatives-royales" style="margin-top: 2rem;">
+            <div class="bulle-tentative-royale used"></div>
+            <div class="bulle-tentative-royale used"></div>
+            <div class="bulle-tentative-royale used"></div>
           </div>
         </div>
       </div>
 
       <script>
+        // Génération des particules dorées
+        function genererParticules() {
+          const container = document.getElementById('particules');
+          for (let i = 0; i < 50; i++) {
+            const particule = document.createElement('div');
+            particule.className = 'particule';
+            particule.style.left = Math.random() * 100 + '%';
+            particule.style.animationDelay = Math.random() * 10 + 's';
+            particule.style.animationDuration = 10 + Math.random() * 10 + 's';
+            container.appendChild(particule);
+          }
+        }
+        genererParticules();
+
         let minutes = ${minutesRestants};
         let secondes = 0;
         
@@ -1124,7 +1173,7 @@ app.get("/", (req, res) => {
             secondes--;
           }
           
-          document.querySelector('div[style*="font-size: 4rem"]').textContent = 
+          document.querySelector('div[style*="font-size: 5rem"]').textContent = 
             \`\${minutes}:\${secondes.toString().padStart(2, '0')}\`;
         }, 1000);
       </script>
@@ -1141,62 +1190,73 @@ app.get("/", (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>✨ SARPI - Connexion artistique</title>
+  <title>👑 SARPI - Connexion Royale</title>
   ${getStyles()}
 </head>
 <body>
-  <div class="art-bg">
-    <div class="art-circle art-circle-1"></div>
-    <div class="art-circle art-circle-2"></div>
-    <div class="art-circle art-circle-3"></div>
-  </div>
+  <div class="particules-dorees" id="particules"></div>
 
-  <div class="login-art">
-    <div class="carte-login animate__animated animate__fadeInUp">
-      <div class="entete-login">
-        <div class="logo-login-art">
-          <span>⚡</span>
+  <div class="login-royal">
+    <div class="carte-login-royale animate__animated animate__fadeInUp">
+      <div class="entete-login-royal">
+        <div class="logo-login-royal">
+          <span>⚜️</span>
         </div>
-        <h1 style="font-size: 2.8rem; background: linear-gradient(145deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0.5rem 0;">Bienvenue</h1>
-        <p style="color: #764ba2; font-weight: 600; font-size: 1.1rem;">Direction Régionale Hassi R'mel</p>
+        <h1 style="font-size: 3.5rem; color: #ffd700; margin: 0.5rem 0; font-family: 'Playfair Display', serif; text-shadow: 0 0 30px #ffd700;">SARPI</h1>
+        <p style="color: rgba(255,255,255,0.9); font-size: 1.3rem;">Direction Régionale Hassi R'mel</p>
       </div>
 
-      <div class="tentatives-art">
+      <div class="tentatives-royales">
         ${[1,2,3].map(i => `
-          <div class="bulle-tentative ${i <= tentativesRestantes ? 'active' : i > tentativesRestantes ? 'used' : ''}"></div>
+          <div class="bulle-tentative-royale ${i <= tentativesRestantes ? 'active' : i > tentativesRestantes ? 'used' : ''}"></div>
         `).join('')}
       </div>
 
-      <p style="text-align: center; color: #666; margin-bottom: 2rem;">
-        Tentatives restantes: <strong style="color: ${tentativesRestantes > 1 ? '#2ecc71' : '#e74c3c'};">${tentativesRestantes}</strong>
+      <p style="text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 2rem; font-size: 1.2rem;">
+        Tentatives restantes: <strong style="color: ${tentativesRestantes > 1 ? '#ffd700' : '#e74c3c'};">${tentativesRestantes}</strong>
       </p>
 
       <form method="POST" action="/login">
-        <div class="groupe-form">
-          <label>👤 Nom d'utilisateur</label>
-          <input type="text" name="username" class="controle-form" placeholder="admin" required>
+        <div class="groupe-form-royal">
+          <label>👑 Nom d'utilisateur</label>
+          <input type="text" name="username" class="controle-form-royal" placeholder="admin" required>
         </div>
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>🔐 Mot de passe</label>
-          <input type="password" name="password" class="controle-form" placeholder="0000" required>
+          <input type="password" name="password" class="controle-form-royal" placeholder="****" required>
         </div>
 
-        <button type="submit" class="btn-art btn-primaire" style="width: 100%;">
+        <button type="submit" class="btn-royal" style="width: 100%;">
           <i class="fas fa-sign-in-alt"></i>
           Se connecter
         </button>
       </form>
 
-      <p style="text-align: center; margin-top: 2rem; color: #999; font-size: 0.9rem;">
-        <i class="fas fa-info-circle"></i> admin / 0000
+      <p style="text-align: center; margin-top: 2rem; color: rgba(255,255,255,0.5); font-size: 1rem;">
+        <i class="fas fa-info-circle"></i> Accès réservé au personnel autorisé
       </p>
     </div>
   </div>
 
   <script>
+    // Génération des particules dorées
+    function genererParticules() {
+      const container = document.getElementById('particules');
+      for (let i = 0; i < 50; i++) {
+        const particule = document.createElement('div');
+        particule.className = 'particule';
+        particule.style.left = Math.random() * 100 + '%';
+        particule.style.animationDelay = Math.random() * 10 + 's';
+        particule.style.animationDuration = 10 + Math.random() * 10 + 's';
+        container.appendChild(particule);
+      }
+    }
+    genererParticules();
+
     document.addEventListener('contextmenu', e => e.preventDefault());
-    console.log('%c✨ SARPI - Système Artistique v4.0 ✨', 'color: #667eea; font-size: 16px; font-weight: bold;');
+    console.log('%c👑 SARPI - Système Royal v5.0 👑', 'color: #ffd700; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #ffd700;');
+    console.log('%c✨ Design Royal par ABDELHAKEM LAMINE', 'color: #ffd700; font-size: 16px;');
   </script>
 </body>
 </html>
@@ -1232,30 +1292,41 @@ app.post("/login", (req, res) => {
     ${getStyles()}
   </head>
   <body>
-    <div class="art-bg">
-      <div class="art-circle art-circle-1"></div>
-      <div class="art-circle art-circle-2"></div>
-      <div class="art-circle art-circle-3"></div>
-    </div>
+    <div class="particules-dorees" id="particules"></div>
     
-    <div class="login-art">
-      <div class="carte-login">
-        <div class="logo-login-art" style="background: linear-gradient(145deg, #e74c3c, #c0392b);">
+    <div class="login-royal">
+      <div class="carte-login-royale">
+        <div class="logo-login-royal" style="background: linear-gradient(145deg, #e74c3c, #c0392b);">
           <span>!</span>
         </div>
         
-        <h2 style="color: #e74c3c; text-align: center; margin: 1.5rem 0;">Identifiants incorrects</h2>
+        <h2 style="color: #e74c3c; text-align: center; margin: 2rem 0; font-family: 'Playfair Display', serif; font-size: 2.5rem;">Identifiants incorrects</h2>
         
-        <p style="text-align: center; color: #666; margin: 1.5rem 0; font-size: 1.1rem;">
+        <p style="text-align: center; color: rgba(255,255,255,0.8); margin: 2rem 0; font-size: 1.3rem;">
           Tentatives restantes: <strong style="color: #e74c3c;">${3 - tentativesConnexion}</strong>
         </p>
         
-        <a href="/" class="btn-art btn-primaire" style="width: 100%; text-align: center; text-decoration: none;">
+        <a href="/" class="btn-royal" style="width: 100%; text-align: center; text-decoration: none;">
           <i class="fas fa-redo-alt"></i>
           Réessayer
         </a>
       </div>
     </div>
+
+    <script>
+      function genererParticules() {
+        const container = document.getElementById('particules');
+        for (let i = 0; i < 50; i++) {
+          const particule = document.createElement('div');
+          particule.className = 'particule';
+          particule.style.left = Math.random() * 100 + '%';
+          particule.style.animationDelay = Math.random() * 10 + 's';
+          particule.style.animationDuration = 10 + Math.random() * 10 + 's';
+          container.appendChild(particule);
+        }
+      }
+      genererParticules();
+    </script>
   </body>
   </html>
   `);
@@ -1275,31 +1346,31 @@ app.get("/consultations", (req, res) => {
   <td>${new Date(c.dateLancement).toLocaleDateString('fr-FR')}</td>
   <td>${new Date(c.dateRemise).toLocaleDateString('fr-FR')}</td>
   <td>
-    <span class="badge ${c.prorogation === 'OUI' ? 'badge-prorogation-oui' : 'badge-prorogation-non'}">
+    <span class="badge-royal ${c.prorogation === 'OUI' ? 'badge-oui' : 'badge-non'}">
       ${c.prorogation || 'NON'}
     </span>
   </td>
-  <td class="${c.nombreOffres > 0 ? 'badge-offres-positif' : 'badge-offres-negatif'}" style="font-weight: 700;">
+  <td class="${c.nombreOffres > 0 ? 'badge-offres-positif' : ''}" style="font-weight: 700; font-size: 1.2rem;">
     ${c.nombreOffres || 0}
   </td>
   <td>
-    <i class="fas fa-user-circle" style="color: #667eea; margin-right: 5px;"></i>
+    <i class="fas fa-crown" style="color: #ffd700; margin-right: 5px;"></i>
     ${c.charge.split(' ').map(m => m[0]).join('')}
   </td>
   <td>
-    <div class="actions-art">
-      <button class="btn-action-art btn-voir" onclick="voirConsultation(${i})"><i class="fas fa-eye"></i></button>
-      <button class="btn-action-art btn-modifier" onclick="modifierConsultation(${i})"><i class="fas fa-edit"></i></button>
-      <button class="btn-action-art btn-supprimer" onclick="supprimerConsultation(${i})"><i class="fas fa-trash"></i></button>
+    <div class="actions-royales">
+      <button class="btn-action-royal" onclick="voirConsultation(${i})"><i class="fas fa-eye"></i></button>
+      <button class="btn-action-royal" onclick="modifierConsultation(${i})"><i class="fas fa-edit"></i></button>
+      <button class="btn-action-royal" onclick="supprimerConsultation(${i})"><i class="fas fa-trash"></i></button>
     </div>
   </td>
 </tr>
 `).join("");
 
   if (!consultations.length) {
-    lignes = `<tr><td colspan="8" style="text-align: center; padding: 4rem;">
-      <i class="fas fa-folder-open" style="font-size: 4rem; color: #667eea; margin-bottom: 1rem; display: block;"></i>
-      <p style="color: #666; font-size: 1.2rem;">Aucune consultation enregistrée</p>
+    lignes = `<tr><td colspan="8" style="text-align: center; padding: 5rem;">
+      <i class="fas fa-crown" style="font-size: 5rem; color: #ffd700; margin-bottom: 1rem; display: block;"></i>
+      <p style="color: rgba(255,255,255,0.8); font-size: 1.5rem;">Aucune consultation enregistrée</p>
     </td></tr>`;
   }
 
@@ -1309,51 +1380,47 @@ app.get("/consultations", (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>✨ SARPI - Tableau de bord artistique</title>
+  <title>👑 SARPI - Tableau de Bord Royal</title>
   ${getStyles()}
 </head>
 <body>
-  <div class="art-bg">
-    <div class="art-circle art-circle-1"></div>
-    <div class="art-circle art-circle-2"></div>
-    <div class="art-circle art-circle-3"></div>
-  </div>
+  <div class="particules-dorees" id="particules"></div>
 
   <!-- Modal ajout/modification -->
-  <div class="modal-art" id="consultationModal">
-    <div class="contenu-modal-art">
-      <div class="entete-modal-art">
+  <div class="modal-royal" id="consultationModal">
+    <div class="contenu-modal-royal">
+      <div class="entete-modal-royal">
         <h2 id="modalTitre">➕ Nouvelle consultation</h2>
-        <div class="fermer-modal" onclick="fermerModal()">&times;</div>
+        <div class="fermer-modal-royal" onclick="fermerModal()">&times;</div>
       </div>
       
       <form id="consultationForm" method="POST" action="/add" onsubmit="return handleSubmit(event)">
         <input type="hidden" name="id" id="consultationId">
         <input type="hidden" name="secretCode" id="secretCode">
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>📋 Numéro de consultation</label>
-          <input type="number" name="numero" id="numero" class="controle-form" required>
+          <input type="number" name="numero" id="numero" class="controle-form-royal" required>
         </div>
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>📝 Désignation de la prestation</label>
-          <textarea name="designation" id="designation" class="controle-form" rows="3" required></textarea>
+          <textarea name="designation" id="designation" class="controle-form-royal" rows="3" required></textarea>
         </div>
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>📅 Date de lancement</label>
-          <input type="date" name="dateLancement" id="dateLancement" class="controle-form" required>
+          <input type="date" name="dateLancement" id="dateLancement" class="controle-form-royal" required>
         </div>
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>⏰ Date limite de remise</label>
-          <input type="date" name="dateRemise" id="dateRemise" class="controle-form" required>
+          <input type="date" name="dateRemise" id="dateRemise" class="controle-form-royal" required>
         </div>
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>🔄 Prorogation</label>
-          <div class="radio-groupe">
+          <div class="radio-groupe-royal">
             <label>
               <input type="radio" name="prorogation" value="NON" checked> Sans prorogation
             </label>
@@ -1363,14 +1430,14 @@ app.get("/consultations", (req, res) => {
           </div>
         </div>
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>📊 Nombre d'offres</label>
-          <input type="number" name="nombreOffres" id="nombreOffres" class="controle-form" min="0" value="0">
+          <input type="number" name="nombreOffres" id="nombreOffres" class="controle-form-royal" min="0" value="0">
         </div>
         
-        <div class="groupe-form">
+        <div class="groupe-form-royal">
           <label>👤 Chargé(e) du dossier</label>
-          <select name="charge" id="charge" class="controle-form" required>
+          <select name="charge" id="charge" class="controle-form-royal" required>
             <option value="">Sélectionner</option>
             <option value="OULD HAMOUDA DHEHBIYA">OULD HAMOUDA DHEHBIYA</option>
             <option value="FAID KAMEL">FAID KAMEL</option>
@@ -1383,10 +1450,10 @@ app.get("/consultations", (req, res) => {
         </div>
         
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-          <button type="submit" class="btn-art btn-primaire" style="flex: 1;">
+          <button type="submit" class="btn-royal" style="flex: 1;">
             <i class="fas fa-save"></i> Enregistrer
           </button>
-          <button type="button" class="btn-art btn-secondaire" style="flex: 1;" onclick="fermerModal()">
+          <button type="button" class="btn-royal btn-secondaire-royal" style="flex: 1;" onclick="fermerModal()">
             <i class="fas fa-times"></i> Annuler
           </button>
         </div>
@@ -1395,27 +1462,40 @@ app.get("/consultations", (req, res) => {
   </div>
 
   <!-- Modal visualisation -->
-  <div class="modal-art" id="viewModal">
-    <div class="contenu-modal-art">
-      <div class="entete-modal-art">
+  <div class="modal-royal" id="viewModal">
+    <div class="contenu-modal-royal">
+      <div class="entete-modal-royal">
         <h2>🔍 Détails de la consultation</h2>
-        <div class="fermer-modal" onclick="fermerViewModal()">&times;</div>
+        <div class="fermer-modal-royal" onclick="fermerViewModal()">&times;</div>
       </div>
-      <div id="viewContenu" style="line-height: 2.5; font-size: 1.1rem;"></div>
-      <button class="btn-art btn-secondaire" style="width: 100%; margin-top: 2rem;" onclick="fermerViewModal()">
+      <div id="viewContenu" style="line-height: 3; font-size: 1.2rem; color: rgba(255,255,255,0.9);"></div>
+      <button class="btn-royal btn-secondaire-royal" style="width: 100%; margin-top: 2rem;" onclick="fermerViewModal()">
         <i class="fas fa-check"></i> Fermer
       </button>
     </div>
   </div>
 
-  <div class="container-elegant">
-    <!-- Header artistique -->
-    <div class="header-art">
-      <div class="logo-masterpiece">
-        <div class="logo-framed">
-          <span>⚡</span>
+  <div class="container-royal">
+    <!-- Header royal avec logo animé -->
+    <div class="header-royal">
+      <div class="logo-section">
+        <div class="logo-container">
+          <div class="logo-royal">
+            <div class="face-logo face-avant">
+              <span>⚜️</span>
+            </div>
+            <div class="face-logo face-arriere">
+              <span>👑</span>
+            </div>
+            <div class="face-logo face-gauche">
+              <span>✨</span>
+            </div>
+            <div class="face-logo face-droite">
+              <span>💫</span>
+            </div>
+          </div>
         </div>
-        <div class="title-art">
+        <div class="titre-royal">
           <h1>SARPI Spa</h1>
           <p>
             <i class="fas fa-map-marker-alt"></i>
@@ -1424,76 +1504,76 @@ app.get("/consultations", (req, res) => {
         </div>
       </div>
       
-      <div class="horloge-design">
-        <div class="horloge-icon">
+      <div class="horloge-royale">
+        <div class="horloge-icone">
           <i class="fas fa-clock"></i>
         </div>
-        <span class="horloge-digital" id="horloge">${getDateHeureActuelle()}</span>
+        <span class="horloge-texte" id="horloge">${getDateHeureActuelle()}</span>
       </div>
     </div>
 
-    <!-- Statistiques élégantes -->
-    <div class="stats-elegance">
-      <div class="carte-stat">
-        <div class="stat-icon-art">
+    <!-- Statistiques royales -->
+    <div class="stats-royales">
+      <div class="carte-royale">
+        <div class="icone-carte">
           <i class="fas fa-folder-open"></i>
         </div>
-        <div class="stat-chiffre">${totalConsultations}</div>
-        <div class="stat-label-art">Total consultations</div>
+        <div class="chiffre-carte">${totalConsultations}</div>
+        <div class="label-carte">Total consultations</div>
       </div>
       
-      <div class="carte-stat">
-        <div class="stat-icon-art">
+      <div class="carte-royale">
+        <div class="icone-carte">
           <i class="fas fa-check-circle"></i>
         </div>
-        <div class="stat-chiffre">${consultationsAvecOffres}</div>
-        <div class="stat-label-art">Avec offres</div>
+        <div class="chiffre-carte">${consultationsAvecOffres}</div>
+        <div class="label-carte">Avec offres</div>
       </div>
       
-      <div class="carte-stat">
-        <div class="stat-icon-art">
+      <div class="carte-royale">
+        <div class="icone-carte">
           <i class="fas fa-times-circle"></i>
         </div>
-        <div class="stat-chiffre">${consultationsSansOffres}</div>
-        <div class="stat-label-art">Sans offres</div>
+        <div class="chiffre-carte">${consultationsSansOffres}</div>
+        <div class="label-carte">Sans offres</div>
       </div>
       
-      <div class="carte-stat">
-        <div class="stat-icon-art">
+      <div class="carte-royale">
+        <div class="icone-carte">
           <i class="fas fa-users"></i>
         </div>
-        <div class="stat-chiffre">${chargesUniques}</div>
-        <div class="stat-label-art">Chargés actifs</div>
+        <div class="chiffre-carte">${chargesUniques}</div>
+        <div class="label-carte">Chargés actifs</div>
       </div>
     </div>
 
     <!-- Recherche et actions -->
-    <div class="recherche-art">
-      <div class="wrapper-recherche">
-        <input type="text" class="input-art" id="rechercheInput" placeholder="🔍 Rechercher par numéro, désignation ou chargé...">
-        <button class="btn-art btn-primaire" onclick="afficherAjoutModal()">
+    <div class="recherche-royale">
+      <div class="wrapper-recherche-royal">
+        <input type="text" class="input-royal" id="rechercheInput" placeholder="🔍 Rechercher par numéro, désignation ou chargé...">
+        <button class="btn-royal" onclick="afficherAjoutModal()">
           <i class="fas fa-plus"></i> Ajouter
         </button>
-        <button class="btn-art btn-secondaire" onclick="toggleFiltres()">
+        <button class="btn-royal btn-secondaire-royal" onclick="toggleFiltres()">
           <i class="fas fa-filter"></i> Filtres
         </button>
-        <button class="btn-art btn-secondaire" onclick="exporterTableau()">
+        <button class="btn-royal btn-secondaire-royal" onclick="exporterTableau()">
           <i class="fas fa-download"></i> Exporter
         </button>
       </div>
 
       <!-- Panneau de filtres -->
-      <div class="filtres-elegants" id="filtresPanel">
-        <div class="grille-filtres">
-          <div class="item-filtre">
+      <div class="filtres-royaux" id="filtresPanel">
+        <div class="grille-filtres-royaux">
+          <div class="item-filtre-royal">
             <label>📅 Date lancement</label>
             <input type="date" id="filtreDateLancement">
           </div>
-          <div class="item-filtre">
+          <div class="item-filtre-royal">
             <label>📅 Date remise</label>
             <input type="date" id="filtreDateRemise">
           </div>
-          <div class="item-filtre">
+          <div class="item-filtre-royal">
             <label>👤 Chargé</label>
             <select id="filtreCharge">
               <option value="">Tous</option>
@@ -1506,7 +1586,7 @@ app.get("/consultations", (req, res) => {
               <option value="KEDAID AHMED">KEDAID AHMED</option>
             </select>
           </div>
-          <div class="item-filtre">
+          <div class="item-filtre-royal">
             <label>🔄 Prorogation</label>
             <select id="filtreProrogation">
               <option value="">Tous</option>
@@ -1516,19 +1596,19 @@ app.get("/consultations", (req, res) => {
           </div>
         </div>
         <div style="display: flex; gap: 1rem;">
-          <button class="btn-art btn-primaire" onclick="appliquerFiltres()">
+          <button class="btn-royal" onclick="appliquerFiltres()">
             <i class="fas fa-check"></i> Appliquer
           </button>
-          <button class="btn-art btn-secondaire" onclick="reinitialiserFiltres()">
+          <button class="btn-royal btn-secondaire-royal" onclick="reinitialiserFiltres()">
             <i class="fas fa-undo"></i> Réinitialiser
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Tableau élégant -->
-    <div class="tableau-container">
-      <table class="tableau-elegant" id="consultationsTable">
+    <!-- Tableau royal -->
+    <div class="tableau-container-royal">
+      <table class="tableau-royal" id="consultationsTable">
         <thead>
           <tr>
             <th onclick="trierTableau(0)">N° <i class="fas fa-sort"></i></th>
@@ -1548,25 +1628,25 @@ app.get("/consultations", (req, res) => {
     </div>
 
     <!-- Pagination -->
-    <div class="pagination-elegante" id="pagination"></div>
+    <div class="pagination-royale" id="pagination"></div>
 
-    <!-- Footer artistique -->
-    <footer class="footer-art">
+    <!-- Footer royal -->
+    <footer class="footer-royal">
       <div>
         <i class="far fa-copyright"></i>
         2025 SARPI Spa - Tous droits réservés
       </div>
       
       <div>
-        <i class="fas fa-paint-brush" style="color: #764ba2;"></i>
-        Design par <span class="designer-name">ABDELHAKEM LAMINE</span>
+        <i class="fas fa-paint-brush" style="color: #ffd700;"></i>
+        Design par <span class="designer-royal">ABDELHAKEM LAMINE</span>
       </div>
       
-      <div class="social-art">
-        <a href="#" class="social-link-art"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" class="social-link-art"><i class="fab fa-linkedin-in"></i></a>
-        <a href="#" class="social-link-art"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="social-link-art"><i class="fab fa-instagram"></i></a>
+      <div class="social-royal">
+        <a href="#" class="social-link-royal"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="social-link-royal"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" class="social-link-royal"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="social-link-royal"><i class="fab fa-instagram"></i></a>
       </div>
     </footer>
   </div>
@@ -1576,6 +1656,20 @@ app.get("/consultations", (req, res) => {
     let pageCourante = 1;
     const itemsParPage = 10;
     const consultations = ${JSON.stringify(consultations)};
+
+    // Génération des particules dorées
+    function genererParticules() {
+      const container = document.getElementById('particules');
+      for (let i = 0; i < 50; i++) {
+        const particule = document.createElement('div');
+        particule.className = 'particule';
+        particule.style.left = Math.random() * 100 + '%';
+        particule.style.animationDelay = Math.random() * 10 + 's';
+        particule.style.animationDuration = 10 + Math.random() * 10 + 's';
+        container.appendChild(particule);
+      }
+    }
+    genererParticules();
 
     // Mise à jour horloge
     function mettreJourHorloge() {
@@ -1613,19 +1707,19 @@ app.get("/consultations", (req, res) => {
       const c = consultations[index];
       const contenu = document.getElementById('viewContenu');
       contenu.innerHTML = \`
-        <p><i class="fas fa-hashtag" style="color: #667eea; width: 30px;"></i> <strong>Numéro:</strong> \${c.numero}</p>
-        <p><i class="fas fa-align-left" style="color: #667eea; width: 30px;"></i> <strong>Désignation:</strong> \${c.designation}</p>
-        <p><i class="fas fa-calendar-plus" style="color: #667eea; width: 30px;"></i> <strong>Date lancement:</strong> \${new Date(c.dateLancement).toLocaleDateString('fr-FR')}</p>
-        <p><i class="fas fa-calendar-check" style="color: #667eea; width: 30px;"></i> <strong>Date remise:</strong> \${new Date(c.dateRemise).toLocaleDateString('fr-FR')}</p>
-        <p><i class="fas fa-clock" style="color: #667eea; width: 30px;"></i> <strong>Prorogation:</strong> \${c.prorogation || 'NON'}</p>
-        <p><i class="fas fa-chart-bar" style="color: #667eea; width: 30px;"></i> <strong>Nombre d'offres:</strong> \${c.nombreOffres || 0}</p>
-        <p><i class="fas fa-user-tie" style="color: #667eea; width: 30px;"></i> <strong>Chargé(e):</strong> \${c.charge}</p>
+        <p><i class="fas fa-hashtag" style="color: #ffd700; width: 30px;"></i> <strong>Numéro:</strong> \${c.numero}</p>
+        <p><i class="fas fa-align-left" style="color: #ffd700; width: 30px;"></i> <strong>Désignation:</strong> \${c.designation}</p>
+        <p><i class="fas fa-calendar-plus" style="color: #ffd700; width: 30px;"></i> <strong>Date lancement:</strong> \${new Date(c.dateLancement).toLocaleDateString('fr-FR')}</p>
+        <p><i class="fas fa-calendar-check" style="color: #ffd700; width: 30px;"></i> <strong>Date remise:</strong> \${new Date(c.dateRemise).toLocaleDateString('fr-FR')}</p>
+        <p><i class="fas fa-clock" style="color: #ffd700; width: 30px;"></i> <strong>Prorogation:</strong> \${c.prorogation || 'NON'}</p>
+        <p><i class="fas fa-chart-bar" style="color: #ffd700; width: 30px;"></i> <strong>Nombre d'offres:</strong> \${c.nombreOffres || 0}</p>
+        <p><i class="fas fa-user-tie" style="color: #ffd700; width: 30px;"></i> <strong>Chargé(e):</strong> \${c.charge}</p>
       \`;
       document.getElementById('viewModal').classList.add('active');
     }
 
     function modifierConsultation(index) {
-      const secret = prompt('🔐 Code secret (2026):');
+      const secret = prompt('🔐 Code secret (8 chiffres):');
       if (secret !== '2026') {
         afficherToast('Code secret incorrect!', 'error');
         return;
@@ -1645,7 +1739,7 @@ app.get("/consultations", (req, res) => {
     }
 
     function supprimerConsultation(index) {
-      const secret = prompt('🔐 Code secret (2026):');
+      const secret = prompt('🔐 Code secret (8 chiffres):');
       if (secret !== '2026') {
         afficherToast('Code secret incorrect!', 'error');
         return;
@@ -1658,7 +1752,7 @@ app.get("/consultations", (req, res) => {
 
     function handleSubmit(event) {
       event.preventDefault();
-      const secret = prompt('🔐 Code secret (2026):');
+      const secret = prompt('🔐 Code secret (8 chiffres):');
       
       if (secret !== '2026') {
         afficherToast('Code secret incorrect!', 'error');
@@ -1761,7 +1855,7 @@ app.get("/consultations", (req, res) => {
     // Toast
     function afficherToast(message, type = 'info') {
       const toast = document.createElement('div');
-      toast.className = 'toast-art ' + type;
+      toast.className = 'toast-royal ' + type;
       
       let icone = 'info-circle';
       if (type === 'success') icone = 'check-circle';
@@ -1779,20 +1873,20 @@ app.get("/consultations", (req, res) => {
     document.addEventListener('contextmenu', e => e.preventDefault());
 
     // Message console
-    console.log('%c✨✨✨ SARPI - Système Artistique v4.0 ✨✨✨', 'color: #667eea; font-size: 20px; font-weight: bold;');
-    console.log('%c🎨 Design par ABDELHAKEM LAMINE', 'color: #764ba2; font-size: 16px;');
-    console.log('%c📊 ' + consultations.length + ' consultations', 'color: #2ecc71; font-size: 14px;');
+    console.log('%c👑👑👑 SARPI - Système Royal v5.0 👑👑👑', 'color: #ffd700; font-size: 24px; font-weight: bold; text-shadow: 0 0 20px #ffd700;');
+    console.log('%c✨ Design Royal par ABDELHAKEM LAMINE', 'color: #ffd700; font-size: 18px;');
+    console.log('%c📊 ' + consultations.length + ' consultations', 'color: #ffd700; font-size: 16px;');
   </script>
 </body>
 </html>
   `);
 });
 
-// Routes API
+// Routes API (avec codes masqués)
 app.post("/add", (req, res) => {
   const { numero, designation, dateLancement, dateRemise, prorogation, nombreOffres, charge, secretCode } = req.body;
   
-  if (secretCode !== CODE_SECRET) {
+  if (secretCode !== "2026") {
     return res.redirect("/consultations?error=code_invalide");
   }
   
@@ -1812,7 +1906,7 @@ app.post("/add", (req, res) => {
 app.post("/update/:i", (req, res) => {
   const { numero, designation, dateLancement, dateRemise, prorogation, nombreOffres, charge, secretCode } = req.body;
   
-  if (secretCode !== CODE_SECRET) {
+  if (secretCode !== "2026") {
     return res.redirect("/consultations?error=code_invalide");
   }
   
@@ -1832,7 +1926,7 @@ app.post("/update/:i", (req, res) => {
 app.get("/delete/:i", (req, res) => {
   const secretCode = req.query.secretCode;
   
-  if (secretCode !== CODE_SECRET) {
+  if (secretCode !== "2026") {
     return res.redirect("/consultations?error=code_invalide");
   }
   
@@ -1843,9 +1937,8 @@ app.get("/delete/:i", (req, res) => {
 // Démarrage du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`\x1b[36m%s\x1b[0m`, `✨✨✨ SARPI - Système Artistique v4.0 ✨✨✨`);
-  console.log(`\x1b[32m%s\x1b[0m`, `🚀 Serveur démarré sur http://localhost:${PORT}`);
-  console.log(`\x1b[33m%s\x1b[0m`, `🔐 Code secret: ${CODE_SECRET}`);
-  console.log(`\x1b[35m%s\x1b[0m`, `👤 Compte: admin / 0000`);
-  console.log(`\x1b[36m%s\x1b[0m`, `🎨 Design par ABDELHAKEM LAMINE`);
+  console.log(`\x1b[33m%s\x1b[0m`, `👑👑👑 SARPI - Système Royal v5.0 👑👑👑`);
+  console.log(`\x1b[33m%s\x1b[0m`, `🚀 Serveur démarré sur http://localhost:${PORT}`);
+  console.log(`\x1b[33m%s\x1b[0m`, `🔐 Code secret: ******** (masqué pour sécurité)`);
+  console.log(`\x1b[33m%s\x1b[0m`, `👑 Design Royal par ABDELHAKEM LAMINE`);
 });
