@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./_________________ BIENVENUE _______________files/SARPI.JPEG">
+    <title>SARPI Spa - Suivi des Consultations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="preloader">
+        <div class="loader">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+        <div class="loading-text">Chargement...</div>
+    </div>
+
+     <div class="particles-container" id="particles-js"><canvas class="particles-js-canvas-el" width="1897" height="962" style="width: 100%; height: 100%;"></canvas></div>
+
+    <header class="animate__animated animate__fadeInDown">
+        <div class="header-container">
+   
+                <img src="./Consultations SARPI 202_files/SARPI.jpg" alt="Logo SARPI" class="logo-img">
+                <div class="logo-text">SARPI Spa</div>
+            </div>
+            
+      
+            </div>
+            
+            <div class="company-info">
+                <h1 class="company-name">SOCIETE ALGERIENNE DE REALISATION DE PROJETS INDUSTRIELS</h1>
+                <h2 class="company-subtitle">FILIALE A 100% SONATRACH</h2>
+                <div class="company-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>DIRECTION REGIONALE HASSI R'MEL : Hassi R'mel</span>
+                </div>
+                <div class="company-address">
+                    <i class="fas fa-envelope"></i>
+                    <span>BOITE POSTALE N° 511, Bureau de poste 24 février, Hassi Rmel, Laghouat</span>
+                </div>
+            </div>
+            
+            <div class="controls-container">
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-sun" id="sunIcon"></i>
+                    <i class="fas fa-moon" id="moonIcon"></i>
+                </div>
+                <div class="clock-container">
+                    <div class="digital-clock" id="clock"></div>
+                    <div class="analog-clock">
+                        <div class="clock-face">
+                            <div class="hand hour-hand"></div>
+                            <div class="hand minute-hand"></div>
+                            <div class="hand second-hand"></div>
+                            <div class="center-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-title animate__animated animate__fadeIn">
+        <h2>TABLEAU DE SUIVI DES CONSULTATIONS 2025</h2>
+    </div>
+
+    <main class="main-content">
+        <div class="search-filters animate__animated animate__fadeInUp">
+            <div class="search-container">
+                <div class="search-input-container">
+                    <input type="text" id="searchInput" placeholder="Rechercher par N° de consultation ou désignation...">
+                    <button id="searchButton" class="btn-search">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+                <div class="advanced-filters">
+                    <button id="toggleFilters" class="btn-toggle-filters">
+                        <i class="fas fa-filter"></i> Filtres avancés
+                    </button>
+                    <div class="filters-panel" id="filtersPanel">
+                        <div class="filter-group">
+                            <label for="dateFilter">Date de lancement:</label>
+                            <input type="date" id="dateFilter">
+                        </div>
+                        <div class="filter-group">
+                            <label for="chargeFilter">Chargé(e) du dossier:</label>
+                            <select id="chargeFilter">
+                                <option value="">Tous</option>
+                               <option value="OULD HAMOUDA DHEHBIYA">OULD HAMOUDA DHEHBIYA</option>
+                                <option value="FAID KAMEL">FAID KAMEL</option>
+                                <option value="MESSAHEL ABDELDJALIL">MESSAHEL ABDELDJALIL</option>
+                                <option value="MEGAMEZ ABDALLAH">MEGAMEZ ABDALLAH</option>
+                                <option value="CHELGHOUM HAMZA">CHELGHOUM HAMZA</option>
+                                <option value="DAOUADI BELKACEM">DAOUADI BELKACEM</option>
+                                <option value="KEDAID AHMED">KEDAID AHMED</option>
+                                                                            
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="statusFilter">Statut:</label>
+                            <select id="statusFilter">
+                                <option value="">Tous</option>
+                                <option value="prorogation">Avec prorogation</option>
+                                <option value="sans-prorogation">Sans prorogation</option>
+                            </select>
+                        </div>
+                        <button id="applyFilters" class="btn-apply-filters">Appliquer</button>
+                        <button id="resetFilters" class="btn-reset-filters">Réinitialiser</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container animate__animated animate__fadeIn">
+            <div class="table-wrapper">
+                <table id="consultationsTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="number">N° DE CONSULTATION <i class="fas fa-sort"></i></th>
+                            <th data-sort="text">DESIGNATION DE PRESTATION <i class="fas fa-sort"></i></th>
+                            <th data-sort="date">DATE DE LANCEMENT <i class="fas fa-sort"></i></th>
+                            <th data-sort="date">DATE LIMITE DE REMISE DES OFFRES <i class="fas fa-sort"></i></th>
+                            <th data-sort="text">PROROGATION <i class="fas fa-sort"></i></th>
+                            <th data-sort="number">NOMBRE DES OFFRES <i class="fas fa-sort"></i></th>
+                            <th data-sort="text">CHARGE(E) DU DOSSIER <i class="fas fa-sort"></i></th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Les données seront chargées dynamiquement via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="pagination" class="pagination">
+                <!-- Pagination générée par JavaScript -->
+            </div>
+            <div id="tableStats" class="table-stats">
+                <!-- Statistiques générées par JavaScript -->
+            </div>
+        </div>
+
+        <div class="admin-controls animate__animated animate__fadeInUp">
+            <button id="addConsultation" class="btn-admin">
+                <i class="fas fa-plus"></i> Ajouter
+            </button>
+            <button id="exportExcel" class="btn-admin">
+                <i class="fas fa-file-excel"></i> Exporter Excel
+            </button>
+            <button id="exportPDF" class="btn-admin">
+                <i class="fas fa-file-pdf"></i> Exporter PDF
+            </button>
+            <button id="printTable" class="btn-admin">
+                <i class="fas fa-print"></i> Imprimer
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal pour ajouter/modifier une consultation -->
+    <div id="consultationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Ajouter une consultation</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="consultationForm">
+                    <input type="hidden" id="consultationId">
+                    <div class="form-group">
+                        <label for="numero">N° de consultation:</label>
+                        <input type="number" id="numero" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="designation">Désignation de prestation:</label>
+                        <textarea id="designation" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateLancement">Date de lancement:</label>
+                        <input type="date" id="dateLancement" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateRemise">Date limite de remise des offres:</label>
+                        <input type="date" id="dateRemise" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prorogation">Prorogation:</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="prorogation" value="NON" checked> Non
+                            </label>
+                            <label>
+                                <input type="radio" name="prorogation" value="date"> Date spécifique
+                            </label>
+                        </div>
+                        <input type="date" id="dateProrogation" class="hidden">
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreOffres">Nombre des offres:</label>
+                        <input type="number" id="nombreOffres" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="charge">Chargé(e) du dossier:</label>
+                        <select id="charge" required>
+                            <option value="">Sélectionner</option>
+              <option value="OULD HAMOUDA DHEHBIYA">OULD HAMOUDA DHEHBIYA</option>
+                                <option value="FAID KAMEL">FAID KAMEL</option>
+                                <option value="MESSAHEL ABDELDJALIL">MESSAHEL ABDELDJALIL</option>
+                                <option value="MEGAMEZ ABDALLAH">MEGAMEZ ABDALLAH</option>
+                                <option value="CHELGHOUM HAMZA">CHELGHOUM HAMZA</option>
+                                <option value="DAOUADI BELKACEM">DAOUADI BELKACEM</option>
+                                <option value="KEDAID AHMED">KEDAID AHMED</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">Enregistrer</button>
+                        <button type="button" class="btn-cancel">Annuler</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmation</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Êtes-vous sûr de vouloir effectuer cette action?</p>
+                <div class="form-group" id="passwordGroup">
+                    <label for="password">Mot de passe administrateur:</label>
+                    <input type="password" id="password">
+                </div>
+                <div class="form-actions">
+                    <button id="confirmYes" class="btn-submit">Confirmer</button>
+                    <button id="confirmNo" class="btn-cancel">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de visualisation détaillée -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Détails de la consultation</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="consultationDetails">
+                    <!-- Détails générés par JavaScript -->
+                </div>
+                <div class="form-actions">
+                    <button class="btn-cancel">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <footer class="animate__animated animate__fadeInUp">
+       <footer class="animate__animated animate__fadeInUp">
+        <div class="footer-content">
+            <div class="copyright">
+                © Copyright 2025 | SARPI Spa - Direction Régionale Hassi R'mel
+            </div>
+            <div class="designer">
+                Design by <span class="designer-name">ABDELHAKEM LAMINE</span>
+            </div>
+            <div class="social-links">
+                <a href="https://abdelhakem-lamine.glitch.me/" class="social-link"><i class="fab fa-facebook"></i></a>
+                <a href="https://abdelhakem-amine.netlify.app/" class="social-link"><i class="fab fa-linkedin"></i></a>
+                <a href="https://comingsoon-abdelhakem-lamine.netlify.app/" class="social-link"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
