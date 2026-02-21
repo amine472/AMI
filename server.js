@@ -3,461 +3,583 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("public"));
 
 let consultations = [];
-
-// نظام تسجيل الدخول مع التجميد
 let loginAttempts = 0;
 let isFrozen = false;
 let freezeUntil = null;
-
-// الرقم السري للعمليات (2026)
 const SECRET_CODE = "2026";
 
-// دالة للحصول على التاريخ والوقت الحالي
 function getCurrentDateTime() {
-  const now = new Date();
-  const options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  };
-  return now.toLocaleDateString('fr-FR', options);
+  return new Date().toLocaleDateString("fr-FR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
-// دالة للحصول على الوقت المتبقي من التجميد
 function getRemainingFreezeTime() {
   if (!isFrozen || !freezeUntil) return 0;
-  const remaining = Math.max(0, Math.ceil((freezeUntil - Date.now()) / 1000 / 60));
-  return remaining;
+  return Math.max(0, Math.ceil((freezeUntil - Date.now()) / 1000 / 60));
 }
 
-// دالة مساعدة لتوليد الستايل المشترك (CSS محسّن وبسيط)
 const getStyles = () => `
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  
-  * { 
-    box-sizing: border-box; 
-    font-family: 'Inter', sans-serif;
+  * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
-  
+
   body {
-    background: linear-gradient(145deg, #0a1929 0%, #1a2a3a 100%);
     min-height: 100vh;
-    margin: 0;
+    background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 1rem;
   }
 
   .container {
-    background: rgba(255, 255, 255, 0.98);
-    border-radius: 32px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     width: 100%;
-    max-width: 500px;
-    padding: 2.5rem;
-    position: relative;
-    overflow: hidden;
+    max-width: 1400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 32px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 20, 30, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
-  .container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-  }
-
-  /* Header */
+  /* Header moderne */
   .header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .logo {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 1rem;
-    background: linear-gradient(145deg, #3b82f6, #8b5cf6);
-    border-radius: 30px;
     display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
     align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
-  }
-
-  .logo span {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: white;
-  }
-
-  .title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #1e293b;
-    letter-spacing: -0.5px;
-    margin-bottom: 0.25rem;
-  }
-
-  .subtitle {
-    color: #64748b;
-    font-size: 0.95rem;
-    font-weight: 400;
-  }
-
-  /* DateTime */
-  .datetime-bar {
-    background: #f8fafc;
-    border-radius: 20px;
-    padding: 1rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    border: 1px solid #e2e8f0;
-  }
-
-  .datetime-bar i {
-    color: #3b82f6;
-    font-size: 1.2rem;
-  }
-
-  .datetime-text {
-    color: #1e293b;
-    font-weight: 500;
-    font-size: 1rem;
-  }
-
-  /* Attempts Indicator */
-  .attempts-container {
-    margin-bottom: 2rem;
-  }
-
-  .attempts-label {
-    display: flex;
     justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(0, 119, 182, 0.1);
+  }
+
+  .logo-area {
+    display: flex;
     align-items: center;
-    margin-bottom: 0.75rem;
-    color: #64748b;
+    gap: 1rem;
+  }
+
+  .logo-icon {
+    width: 50px;
+    height: 50px;
+    background: #0077b6;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    box-shadow: 0 10px 20px rgba(0, 119, 182, 0.2);
+  }
+
+  .company-details h1 {
+    font-size: 1.4rem;
+    color: #1e2b3c;
+    font-weight: 600;
+  }
+
+  .company-details p {
+    color: #5e6f8d;
     font-size: 0.9rem;
   }
 
-  .attempts-count {
-    font-weight: 600;
-    color: #1e293b;
-  }
-
-  .attempts-bars {
+  .date-display {
+    background: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 100px;
+    color: #0077b6;
+    font-weight: 500;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .attempt-bar {
-    height: 6px;
+  /* Cartes statistiques */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 24px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 119, 182, 0.1);
+    transition: transform 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0077b6;
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-label {
+    color: #5e6f8d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Barre de recherche */
+  .search-section {
+    margin-bottom: 2rem;
+  }
+
+  .search-wrapper {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
     flex: 1;
-    background: #e2e8f0;
-    border-radius: 3px;
-    transition: all 0.2s ease;
+    min-width: 250px;
+    padding: 1rem 1.5rem;
+    border: 2px solid #e1e8f0;
+    border-radius: 16px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: white;
   }
 
-  .attempt-bar.active {
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  .search-input:focus {
+    outline: none;
+    border-color: #0077b6;
+    box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.1);
   }
 
-  .attempt-bar.used {
-    background: #fecaca;
+  .btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  /* Form */
+  .btn-primary {
+    background: #0077b6;
+    color: white;
+    box-shadow: 0 8px 16px rgba(0, 119, 182, 0.2);
+  }
+
+  .btn-primary:hover {
+    background: #005f94;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: #1e2b3c;
+    border: 2px solid #e1e8f0;
+  }
+
+  .btn-secondary:hover {
+    background: #f8fafd;
+    border-color: #0077b6;
+  }
+
+  /* Tableau */
+  .table-container {
+    overflow-x: auto;
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+  }
+
+  th {
+    text-align: left;
+    padding: 1.2rem 1rem;
+    background: #f8fafd;
+    color: #1e2b3c;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e1e8f0;
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid #eef2f6;
+    color: #2c3e50;
+  }
+
+  tr:hover td {
+    background: #f8fafd;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+
+  .action-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .btn-view { background: #3498db; }
+  .btn-edit { background: #2ecc71; }
+  .btn-delete { background: #e74c3c; }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 32px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .modal-header h2 {
+    color: #1e2b3c;
+    font-size: 1.5rem;
+  }
+
+  .close-modal {
+    font-size: 2rem;
+    cursor: pointer;
+    color: #5e6f8d;
+    transition: color 0.2s;
+  }
+
+  .close-modal:hover {
+    color: #e74c3c;
+  }
+
   .form-group {
     margin-bottom: 1.5rem;
   }
 
-  .form-label {
+  .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #1e293b;
+    color: #1e2b3c;
     font-weight: 500;
     font-size: 0.95rem;
   }
 
-  .input-wrapper {
-    position: relative;
+  .form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid #e1e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #0077b6;
+    box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.1);
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .radio-group label {
     display: flex;
     align-items: center;
-  }
-
-  .input-icon {
-    position: absolute;
-    left: 16px;
-    color: #94a3b8;
-    font-size: 1.1rem;
-  }
-
-  .form-input {
-    width: 100%;
-    padding: 14px 16px 14px 48px;
-    border: 2px solid #e2e8f0;
-    border-radius: 18px;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    background: white;
-    outline: none;
-  }
-
-  .form-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-  }
-
-  .form-input::placeholder {
-    color: #94a3b8;
-    font-weight: 300;
-  }
-
-  /* Button */
-  .btn-login {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(145deg, #3b82f6, #2563eb);
-    color: white;
-    border: none;
-    border-radius: 18px;
-    font-size: 1rem;
-    font-weight: 600;
+    gap: 0.5rem;
+    font-weight: normal;
     cursor: pointer;
-    transition: all 0.2s ease;
+  }
+
+  /* Login page */
+  .login-container {
+    max-width: 400px;
+    margin: 2rem auto;
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .login-logo {
+    width: 80px;
+    height: 80px;
+    background: #0077b6;
+    border-radius: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-  }
-
-  .btn-login:hover {
-    background: linear-gradient(145deg, #2563eb, #1d4ed8);
-    transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-  }
-
-  .btn-login i {
-    font-size: 1.1rem;
-  }
-
-  /* Info Box */
-  .info-box {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 1.25rem;
-    border: 1px solid #e2e8f0;
-  }
-
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    color: #475569;
-    font-size: 0.95rem;
-  }
-
-  .info-row:not(:last-child) {
-    border-bottom: 1px dashed #e2e8f0;
-  }
-
-  .info-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .info-value {
-    font-weight: 600;
-    color: #1e293b;
-    background: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    border: 1px solid #e2e8f0;
-  }
-
-  .badge {
-    background: linear-gradient(145deg, #fbbf24, #f59e0b);
     color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+  }
+
+  .attempts {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 1.5rem 0;
+  }
+
+  .attempt-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e1e8f0;
+    transition: all 0.3s;
+  }
+
+  .attempt-dot.active {
+    background: #0077b6;
+    box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.2);
+  }
+
+  .attempt-dot.used {
+    background: #e74c3c;
+  }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .page-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 2px solid #e1e8f0;
+    background: white;
+    color: #1e2b3c;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .page-btn.active {
+    background: #0077b6;
+    color: white;
+    border-color: #0077b6;
+  }
+
+  .page-btn:hover:not(.active) {
+    background: #f8fafd;
+    border-color: #0077b6;
   }
 
   /* Footer */
   .footer {
-    text-align: center;
     margin-top: 2rem;
-    color: #94a3b8;
-    font-size: 0.85rem;
-  }
-
-  /* Freeze Screen */
-  .freeze-container {
+    padding: 1.5rem;
     text-align: center;
+    color: #5e6f8d;
+    font-size: 0.9rem;
+    border-top: 2px solid rgba(0, 119, 182, 0.1);
+    width: 100%;
+    max-width: 1400px;
   }
 
-  .freeze-icon {
-    width: 80px;
-    height: 80px;
-    background: #1e293b;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 2rem;
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: white;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #0077b6;
+    animation: slideIn 0.3s ease;
+    z-index: 2000;
   }
 
-  .freeze-icon i {
-    font-size: 3rem;
-    color: #3b82f6;
-  }
-
-  .freeze-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 1rem;
-  }
-
-  .freeze-timer {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(145deg, #3b82f6, #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 1rem 0;
-    font-family: monospace;
-  }
-
-  .freeze-message {
-    color: #64748b;
-    margin-bottom: 2rem;
-  }
-
-  .btn-return {
-    display: inline-block;
-    padding: 12px 30px;
-    background: #f1f5f9;
-    color: #1e293b;
-    text-decoration: none;
-    border-radius: 30px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-  }
-
-  .btn-return:hover {
-    background: #e2e8f0;
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
   }
 
   /* Responsive */
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     .container {
+      padding: 1rem;
+    }
+    
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    
+    .search-wrapper {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .modal-content {
       padding: 1.5rem;
+      width: 95%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
     }
     
-    .title {
-      font-size: 1.5rem;
-    }
-    
-    .freeze-timer {
-      font-size: 2.5rem;
+    .company-details h1 {
+      font-size: 1.1rem;
     }
   }
 </style>
 `;
 
-/* ===== MIDDLEWARE للتحقق من الرقم السري وحالة التجميد ===== */
+// Middleware de vérification
 app.use((req, res, next) => {
-  // التحقق من حالة التجميد
   if (isFrozen && freezeUntil && Date.now() >= freezeUntil) {
     isFrozen = false;
     freezeUntil = null;
     loginAttempts = 0;
   }
 
-  if (isFrozen && req.path !== '/') {
-    return res.redirect('/');
+  if (isFrozen && req.path !== "/") {
+    return res.redirect("/");
   }
   
   next();
 });
 
-/* ===== PAGE D'ACCUEIL محسّنة ===== */
+// Page de connexion
 app.get("/", (req, res) => {
   const remainingMinutes = getRemainingFreezeTime();
   
   if (isFrozen && remainingMinutes > 0) {
     return res.send(`
     <!DOCTYPE html>
-    <html lang="fr">
+    <html>
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>SARPI Spa - Système verrouillé</title>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+      <title>SARPI - Accès temporairement bloqué</title>
       ${getStyles()}
     </head>
     <body>
-      <div class="container">
-        <div class="freeze-container">
-          <div class="freeze-icon">
-            <i class="fas fa-lock"></i>
+      <div class="login-container container">
+        <div style="text-align: center; padding: 2rem;">
+          <div class="login-logo" style="background: #e74c3c;">⏰</div>
+          <h2 style="color: #e74c3c; margin: 1rem 0;">Accès temporairement bloqué</h2>
+          <p style="color: #5e6f8d; margin-bottom: 2rem;">Trop de tentatives échouées</p>
+          <div style="font-size: 3rem; font-weight: 700; color: #0077b6; margin: 2rem 0;">
+            ${remainingMinutes}:00
           </div>
-          <h1 class="freeze-title">Système verrouillé</h1>
-          <div class="freeze-timer" id="timer">${remainingMinutes}:00</div>
-          <p class="freeze-message">
-            Trop de tentatives de connexion échouées<br>
-            Réessayez dans
-          </p>
-          <a href="/" class="btn-return">
-            <i class="fas fa-rotate-right"></i> Actualiser
-          </a>
+          <p style="color: #5e6f8d;">minutes restantes avant déblocage</p>
         </div>
       </div>
-
+      
       <script>
         let minutes = ${remainingMinutes};
         let seconds = 0;
         
-        function updateTimer() {
+        setInterval(() => {
           if (seconds === 0) {
-            if (minutes === 0) {
-              location.reload();
-              return;
-            }
-            minutes--;
-            seconds = 59;
-          } else {
-            seconds--;
-          }
+            if (minutes === 0) location.reload();
+            else { minutes--; seconds = 59; }
+          } else seconds--;
           
-          document.getElementById('timer').textContent = 
+          document.querySelector('div[style*="font-size: 3rem"]').textContent = 
             \`\${minutes}:\${seconds.toString().padStart(2, '0')}\`;
-        }
-        
-        setInterval(updateTimer, 1000);
+        }, 1000);
       </script>
     </body>
     </html>
@@ -465,230 +587,522 @@ app.get("/", (req, res) => {
   }
 
   const attemptsLeft = 3 - loginAttempts;
-  const attemptsUsed = loginAttempts;
   
   res.send(`
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SARPI Spa - Connexion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    ${getStyles()}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SARPI - Connexion</title>
+  ${getStyles()}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <span>SARPI</span>
-            </div>
-            <h1 class="title">Bienvenue</h1>
-            <p class="subtitle">Direction Régionale Hassi R'mel</p>
-        </div>
-
-        <!-- Date et Heure -->
-        <div class="datetime-bar">
-            <i class="fas fa-calendar-alt"></i>
-            <span class="datetime-text" id="currentDateTime">${getCurrentDateTime()}</span>
-        </div>
-
-        <!-- Indicateur de tentatives -->
-        <div class="attempts-container">
-            <div class="attempts-label">
-                <span>Tentatives restantes</span>
-                <span class="attempts-count">${attemptsLeft}/3</span>
-            </div>
-            <div class="attempts-bars">
-                ${[1,2,3].map(i => `
-                    <div class="attempt-bar ${i <= attemptsUsed ? 'used' : (i > attemptsUsed && i <= 3 ? 'active' : '')}"></div>
-                `).join('')}
-            </div>
-        </div>
-
-        <!-- Formulaire de connexion -->
-        <form method="POST" action="/login">
-            <div class="form-group">
-                <label class="form-label">Nom d'utilisateur</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-user input-icon"></i>
-                    <input type="text" name="username" class="form-input" placeholder="admin" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Mot de passe</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" name="password" class="form-input" placeholder="••••" required>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-login">
-                <i class="fas fa-arrow-right-to-bracket"></i>
-                Se connecter
-            </button>
-        </form>
-
-        <!-- Informations -->
-        <div class="info-box">
-            <div class="info-row">
-                <span class="info-label">
-                    <i class="fas fa-user-shield" style="color: #3b82f6;"></i>
-                    Identifiants par défaut
-                </span>
-                <span class="info-value">admin / 0000</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">
-                    <i class="fas fa-clock" style="color: #8b5cf6;"></i>
-                    Session expire après
-                </span>
-                <span class="badge">30 minutes</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">
-                    <i class="fas fa-shield" style="color: #ec4899;"></i>
-                    Sécurité
-                </span>
-                <span class="badge" style="background: #10b981;">Verrouillage 1h</span>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <i class="fas fa-copyright"></i> 2025 SARPI Spa - Tous droits réservés
-        </div>
+  <div class="login-container container">
+    <div class="login-header">
+      <div class="login-logo">SARPI</div>
+      <h2>Bienvenue</h2>
+      <p style="color: #5e6f8d;">Direction Régionale Hassi R'mel</p>
     </div>
 
-    <script>
-        // Mise à jour de l'heure en temps réel
-        function updateDateTime() {
-            const now = new Date();
-            const options = {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            };
-            document.getElementById('currentDateTime').textContent = 
-                now.toLocaleDateString('fr-FR', options);
-        }
-        setInterval(updateDateTime, 1000);
-        
-        // Protection contre le clic droit
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        
-        // Animation douce des inputs
-        const inputs = document.querySelectorAll('.form-input');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'scale(1.01)';
-            });
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'scale(1)';
-            });
-        });
-    </script>
+    <div class="attempts">
+      ${[1,2,3].map(i => `
+        <div class="attempt-dot ${i <= attemptsLeft ? 'active' : i > attemptsLeft ? 'used' : ''}"></div>
+      `).join('')}
+    </div>
+
+    <p style="text-align: center; color: #5e6f8d; margin-bottom: 1.5rem;">
+      Tentatives restantes: <strong style="color: ${attemptsLeft > 1 ? '#2ecc71' : '#e74c3c'}">${attemptsLeft}</strong>
+    </p>
+
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label>Nom d'utilisateur</label>
+        <input type="text" name="username" class="form-control" placeholder="admin" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" name="password" class="form-control" placeholder="0000" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        <i class="fas fa-sign-in-alt"></i>
+        Se connecter
+      </button>
+    </form>
+
+    <p style="text-align: center; margin-top: 1.5rem; color: #5e6f8d; font-size: 0.9rem;">
+      <i class="fas fa-info-circle"></i> admin / 0000
+    </p>
+  </div>
 </body>
 </html>
-`);
+  `);
 });
 
+// Traitement du login
 app.post("/login", (req, res) => {
-  if (isFrozen) {
-    return res.redirect("/");
-  }
+  if (isFrozen) return res.redirect("/");
 
   const { username, password } = req.body;
   
   if (username === "admin" && password === "0000") {
     loginAttempts = 0;
-    res.redirect("/consultations");
-  } else {
-    loginAttempts++;
-    
-    if (loginAttempts >= 3) {
-      isFrozen = true;
-      freezeUntil = Date.now() + (60 * 60 * 1000);
-      
-      return res.send(`
-      <!DOCTYPE html>
-      <html lang="fr">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SARPI Spa - Verrouillé</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        ${getStyles()}
-      </head>
-      <body>
-        <div class="container">
-          <div class="freeze-container">
-            <div class="freeze-icon" style="background: #fee2e2;">
-              <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-            </div>
-            <h1 class="freeze-title">Accès bloqué</h1>
-            <p class="freeze-message">
-              Trop de tentatives échouées<br>
-              Réessayez dans <strong>1 heure</strong>
-            </p>
-            <a href="/" class="btn-return">
-              <i class="fas fa-arrow-left"></i> Retour
-            </a>
-          </div>
-        </div>
-      </body>
-      </html>
-      `);
-    }
-    
-    res.send(`
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Erreur de connexion</title>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-      ${getStyles()}
-    </head>
-    <body>
-      <div class="container">
-        <div class="freeze-container">
-          <div class="freeze-icon" style="background: #fee2e2;">
-            <i class="fas fa-circle-exclamation" style="color: #ef4444;"></i>
-          </div>
-          <h1 class="freeze-title" style="font-size: 1.5rem;">Identifiants incorrects</h1>
-          <div style="margin: 2rem 0;">
-            <div style="font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-              ${3 - loginAttempts}
-            </div>
-            <p style="color: #64748b;">tentative(s) restante(s)</p>
-          </div>
-          <a href="/" class="btn-return">
-            <i class="fas fa-rotate-left"></i> Réessayer
-          </a>
-        </div>
-      </div>
-    </body>
-    </html>
-    `);
+    return res.redirect("/consultations");
   }
+  
+  loginAttempts++;
+  
+  if (loginAttempts >= 3) {
+    isFrozen = true;
+    freezeUntil = Date.now() + (60 * 60 * 1000);
+    return res.redirect("/");
+  }
+  
+  res.send(`
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur de connexion</title>
+    ${getStyles()}
+  </head>
+  <body>
+    <div class="login-container container">
+      <div style="text-align: center;">
+        <div class="login-logo" style="background: #e74c3c;">!</div>
+        <h2 style="color: #e74c3c; margin: 1rem 0;">Identifiants incorrects</h2>
+        <p style="color: #5e6f8d; margin-bottom: 2rem;">Tentatives restantes: ${3 - loginAttempts}</p>
+        <a href="/" class="btn btn-primary">Réessayer</a>
+      </div>
+    </div>
+  </body>
+  </html>
+  `);
 });
 
-// بقية الكود (مسارات consultations) كما هو مع بعض التحسينات البسيطة...
-// [هنا يأتي باقي الكود الخاص بمسارات consultations بنفس الكود السابق]
-// لقد حافظت على نفس الوظائف ولكن مع تحسين واجهة الدخول فقط كما طلبت
+// Page principale des consultations
+app.get("/consultations", (req, res) => {
+  const totalConsultations = consultations.length;
+  const consultationsAvecOffres = consultations.filter(c => c.nombreOffres > 0).length;
+  const consultationsSansOffres = totalConsultations - consultationsAvecOffres;
+  
+  let rows = consultations.map((c, i) => `
+<tr>
+  <td>${c.numero}</td>
+  <td>${c.designation.substring(0, 50)}${c.designation.length > 50 ? '...' : ''}</td>
+  <td>${new Date(c.dateLancement).toLocaleDateString('fr-FR')}</td>
+  <td>${new Date(c.dateRemise).toLocaleDateString('fr-FR')}</td>
+  <td><span style="padding: 0.3rem 0.8rem; background: ${c.prorogation === 'OUI' ? '#fff3cd' : '#e8f5e9'}; color: ${c.prorogation === 'OUI' ? '#856404' : '#2e7d32'}; border-radius: 20px; font-size: 0.85rem;">${c.prorogation || 'NON'}</span></td>
+  <td style="font-weight: 600; color: ${c.nombreOffres > 0 ? '#2ecc71' : '#e74c3c'};">${c.nombreOffres || 0}</td>
+  <td>${c.charge.split(' ').map(m => m[0]).join('')}</td>
+  <td>
+    <div class="action-buttons">
+      <button class="action-btn btn-view" onclick="showConsultation(${i})"><i class="fas fa-eye"></i></button>
+      <button class="action-btn btn-edit" onclick="editConsultation(${i})"><i class="fas fa-edit"></i></button>
+      <button class="action-btn btn-delete" onclick="deleteConsultation(${i})"><i class="fas fa-trash"></i></button>
+    </div>
+  </td>
+</tr>
+`).join("");
 
-/* ===== PORT ===== */
-app.listen(process.env.PORT || 3000, () => {
-  console.log("\x1b[36m%s\x1b[0m", "🚀 SARPI Spa System");
-  console.log("\x1b[32m%s\x1b[0m", "📡 Serveur: http://localhost:3000");
-  console.log("\x1b[33m%s\x1b[0m", "🔑 Code secret: 2026");
+  if (!consultations.length) {
+    rows = `<tr><td colspan="8" style="text-align: center; padding: 3rem;">Aucune consultation enregistrée</td></tr>`;
+  }
+
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SARPI - Suivi des consultations</title>
+  ${getStyles()}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Modal consultation -->
+  <div class="modal" id="consultationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Nouvelle consultation</h2>
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+      </div>
+      
+      <form id="consultationForm" method="POST" action="/add" onsubmit="return handleSubmit(event)">
+        <input type="hidden" name="id" id="consultationId">
+        <input type="hidden" name="secretCode" id="secretCode">
+        
+        <div class="form-group">
+          <label>N° de consultation</label>
+          <input type="number" name="numero" id="numero" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Désignation</label>
+          <textarea name="designation" id="designation" class="form-control" rows="3" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Date de lancement</label>
+          <input type="date" name="dateLancement" id="dateLancement" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Date limite de remise</label>
+          <input type="date" name="dateRemise" id="dateRemise" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Prorogation</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="prorogation" value="NON" checked> Sans prorogation
+            </label>
+            <label>
+              <input type="radio" name="prorogation" value="OUI"> Avec prorogation
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Nombre d'offres</label>
+          <input type="number" name="nombreOffres" id="nombreOffres" class="form-control" min="0" value="0">
+        </div>
+        
+        <div class="form-group">
+          <label>Chargé(e) du dossier</label>
+          <select name="charge" id="charge" class="form-control" required>
+            <option value="">Sélectionner</option>
+            <option value="OULD HAMOUDA DHEHBIYA">OULD HAMOUDA DHEHBIYA</option>
+            <option value="FAID KAMEL">FAID KAMEL</option>
+            <option value="MESSAHEL ABDELDJALIL">MESSAHEL ABDELDJALIL</option>
+            <option value="MEGAMEZ ABDALLAH">MEGAMEZ ABDALLAH</option>
+            <option value="CHELGHOUM HAMZA">CHELGHOUM HAMZA</option>
+            <option value="DAOUADI BELKACEM">DAOUADI BELKACEM</option>
+            <option value="KEDAID AHMED">KEDAID AHMED</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Enregistrer</button>
+          <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeModal()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal visualisation -->
+  <div class="modal" id="viewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Détails de la consultation</h2>
+        <span class="close-modal" onclick="closeViewModal()">&times;</span>
+      </div>
+      <div id="viewContent" style="line-height: 2;"></div>
+      <button class="btn btn-secondary" style="margin-top: 2rem; width: 100%;" onclick="closeViewModal()">Fermer</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-area">
+        <div class="logo-icon">S</div>
+        <div class="company-details">
+          <h1>SARPI Spa</h1>
+          <p><i class="fas fa-map-marker-alt"></i> Direction Régionale Hassi R'mel</p>
+        </div>
+      </div>
+      
+      <div class="date-display">
+        <i class="far fa-calendar-alt"></i>
+        <span id="currentDate">${getCurrentDateTime()}</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">${totalConsultations}</div>
+        <div class="stat-label">Total consultations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${consultationsAvecOffres}</div>
+        <div class="stat-label">Avec offres</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${consultationsSansOffres}</div>
+        <div class="stat-label">Sans offres</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">${new Set(consultations.map(c => c.charge)).size}</div>
+        <div class="stat-label">Chargés actifs</div>
+      </div>
+    </div>
+
+    <!-- Recherche et actions -->
+    <div class="search-section">
+      <div class="search-wrapper">
+        <input type="text" class="search-input" id="searchInput" placeholder="Rechercher par n°, désignation ou chargé..." onkeyup="filterTable()">
+        <button class="btn btn-primary" onclick="showAddModal()">
+          <i class="fas fa-plus"></i> Nouvelle consultation
+        </button>
+        <button class="btn btn-secondary" onclick="exportTable()">
+          <i class="fas fa-download"></i> Exporter
+        </button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-container">
+      <table id="consultationsTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">N° <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(1)">Désignation <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(2)">Lancement <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(3)">Remise <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(4)">Prorogation <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(5)">Offres <i class="fas fa-sort"></i></th>
+            <th onclick="sortTable(6)">Chargé <i class="fas fa-sort"></i></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          ${rows}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 SARPI Spa - Tous droits réservés | Design by ABDELHAKEM LAMINE</p>
+  </footer>
+
+  <script>
+    let currentEditId = null;
+    const consultations = ${JSON.stringify(consultations)};
+
+    // Mise à jour de la date
+    function updateDate() {
+      const now = new Date();
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('fr-FR', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+    setInterval(updateDate, 1000);
+
+    // Gestion des modals
+    function showAddModal() {
+      document.getElementById('modalTitle').textContent = 'Nouvelle consultation';
+      document.getElementById('consultationForm').reset();
+      document.getElementById('consultationId').value = '';
+      currentEditId = null;
+      document.getElementById('consultationModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('consultationModal').classList.remove('active');
+    }
+
+    function closeViewModal() {
+      document.getElementById('viewModal').classList.remove('active');
+    }
+
+    function showConsultation(index) {
+      const c = consultations[index];
+      const content = document.getElementById('viewContent');
+      content.innerHTML = \`
+        <p><strong>N° de consultation:</strong> \${c.numero}</p>
+        <p><strong>Désignation:</strong> \${c.designation}</p>
+        <p><strong>Date de lancement:</strong> \${new Date(c.dateLancement).toLocaleDateString('fr-FR')}</p>
+        <p><strong>Date limite:</strong> \${new Date(c.dateRemise).toLocaleDateString('fr-FR')}</p>
+        <p><strong>Prorogation:</strong> \${c.prorogation || 'NON'}</p>
+        <p><strong>Nombre d'offres:</strong> \${c.nombreOffres || 0}</p>
+        <p><strong>Chargé(e) du dossier:</strong> \${c.charge}</p>
+      \`;
+      document.getElementById('viewModal').classList.add('active');
+    }
+
+    function editConsultation(index) {
+      const secret = prompt('Code secret (2026):');
+      if (secret !== '2026') {
+        alert('Code secret incorrect');
+        return;
+      }
+      
+      const c = consultations[index];
+      document.getElementById('modalTitle').textContent = 'Modifier la consultation';
+      document.getElementById('consultationId').value = index;
+      document.getElementById('numero').value = c.numero;
+      document.getElementById('designation').value = c.designation;
+      document.getElementById('dateLancement').value = c.dateLancement;
+      document.getElementById('dateRemise').value = c.dateRemise;
+      document.querySelector(\`input[name="prorogation"][value="\${c.prorogation || 'NON'}"]\`).checked = true;
+      document.getElementById('nombreOffres').value = c.nombreOffres || 0;
+      document.getElementById('charge').value = c.charge;
+      document.getElementById('consultationModal').classList.add('active');
+    }
+
+    function deleteConsultation(index) {
+      const secret = prompt('Code secret (2026):');
+      if (secret !== '2026') {
+        alert('Code secret incorrect');
+        return;
+      }
+      
+      if (confirm('Confirmer la suppression ?')) {
+        window.location.href = '/delete/' + index + '?secretCode=' + secret;
+      }
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      const secret = prompt('Code secret (2026):');
+      
+      if (secret !== '2026') {
+        alert('Code secret incorrect');
+        return false;
+      }
+      
+      document.getElementById('secretCode').value = secret;
+      const id = document.getElementById('consultationId').value;
+      
+      if (id) {
+        document.getElementById('consultationForm').action = '/update/' + id;
+      }
+      
+      document.getElementById('consultationForm').submit();
+      return false;
+    }
+
+    // Recherche et filtres
+    function filterTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#tableBody tr');
+      
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+      });
+    }
+
+    // Tri du tableau
+    function sortTable(column) {
+      const table = document.getElementById('consultationsTable');
+      const tbody = table.tBodies[0];
+      const rows = Array.from(tbody.rows);
+      
+      const sorted = rows.sort((a, b) => {
+        let aVal = a.cells[column].textContent;
+        let bVal = b.cells[column].textContent;
+        
+        if (column === 2 || column === 3) { // Dates
+          aVal = new Date(aVal);
+          bVal = new Date(bVal);
+        } else if (column === 0 || column === 5) { // Nombres
+          aVal = parseInt(aVal) || 0;
+          bVal = parseInt(bVal) || 0;
+        }
+        
+        if (aVal < bVal) return -1;
+        if (aVal > bVal) return 1;
+        return 0;
+      });
+      
+      tbody.append(...sorted);
+    }
+
+    // Export
+    function exportTable() {
+      let csv = "N°,Désignation,Date lancement,Date remise,Prorogation,Offres,Chargé(e)\\n";
+      
+      consultations.forEach(c => {
+        csv += \`\${c.numero},"\${c.designation.replace(/"/g, '""')}",\${c.dateLancement},\${c.dateRemise},\${c.prorogation || 'NON'},\${c.nombreOffres || 0},\${c.charge}\\n\`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'consultations.csv';
+      a.click();
+    }
+
+    // Désactiver clic droit
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Message console
+    console.log('%cSARPI System v2.0', 'color: #0077b6; font-size: 16px; font-weight: bold;');
+  </script>
+</body>
+</html>
+  `);
+});
+
+// Routes API
+app.post("/add", (req, res) => {
+  const { numero, designation, dateLancement, dateRemise, prorogation, nombreOffres, charge, secretCode } = req.body;
+  
+  if (secretCode !== SECRET_CODE) {
+    return res.redirect("/consultations?error=code_invalide");
+  }
+  
+  consultations.push({
+    numero,
+    designation,
+    dateLancement,
+    dateRemise,
+    prorogation,
+    nombreOffres: nombreOffres || 0,
+    charge
+  });
+  
+  res.redirect("/consultations");
+});
+
+app.post("/update/:i", (req, res) => {
+  const { numero, designation, dateLancement, dateRemise, prorogation, nombreOffres, charge, secretCode } = req.body;
+  
+  if (secretCode !== SECRET_CODE) {
+    return res.redirect("/consultations?error=code_invalide");
+  }
+  
+  consultations[req.params.i] = {
+    numero,
+    designation,
+    dateLancement,
+    dateRemise,
+    prorogation,
+    nombreOffres: nombreOffres || 0,
+    charge
+  };
+  
+  res.redirect("/consultations");
+});
+
+app.get("/delete/:i", (req, res) => {
+  const secretCode = req.query.secretCode;
+  
+  if (secretCode !== SECRET_CODE) {
+    return res.redirect("/consultations?error=code_invalide");
+  }
+  
+  consultations.splice(req.params.i, 1);
+  res.redirect("/consultations");
+});
+
+// Démarrage du serveur
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`\x1b[36m🚀 Serveur démarré sur http://localhost:${PORT}\x1b[0m`);
+  console.log(`\x1b[33m🔐 Code secret: ${SECRET_CODE}\x1b[0m`);
 });
